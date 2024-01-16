@@ -1,4 +1,44 @@
-async function seedCustomers() {
+const {
+  writeBatch,
+  doc,
+  collection,
+  getDocs,
+  where,
+  limit,
+  query,
+} = require("firebase/firestore")
+const { initializeApp, getApp, getApps } = require("firebase/app")
+const { getFirestore } = require("firebase/firestore")
+
+async function initFirebase() {
+  const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSENGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  }
+  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+  const db = getFirestore(app)
+  return { app, db }
+}
+
+async function isEmptyCollection(db, collectionName) {
+  const docs = await getDocs(collection(db, collectionName))
+  if (docs.docs.length > 0) {
+    console.log(`[Error] La collection ${collectionName} n'est pas vide`)
+    return false
+  }
+  return true
+}
+
+async function seedCustomers(db) {
+  if (!(await isEmptyCollection(db, "users"))) {
+    return
+  }
+  const batch = writeBatch(db)
   const customers = [
     {
       id: "1",
@@ -81,10 +121,21 @@ async function seedCustomers() {
       role: "customer",
     },
   ]
-  console.log(customers)
+  Promise.all(
+    customers.map((customer) => {
+      const docRef = doc(collection(db, "users"))
+      batch.set(docRef, { ...customer, id: docRef.id })
+    }),
+  )
+  await batch.commit()
+  console.log("Seeding Customers completed!")
 }
 
-async function seedCompanies() {
+async function seedCompanies(db) {
+  if (!(await isEmptyCollection(db, "users"))) {
+    return
+  }
+  const batch = writeBatch(db)
   const rentalAgencies = [
     {
       id: "1",
@@ -207,10 +258,23 @@ async function seedCompanies() {
       companyName: "Location Fischer Véhicules Lyon Sud",
     },
   ]
-  console.log(rentalAgencies)
+  Promise.all(
+    rentalAgencies.map((agency) => {
+      const docRef = doc(collection(db, "users"))
+      batch.set(docRef, { ...agency, id: docRef.id })
+    }),
+  )
+  await batch.commit()
+  console.log("Seeding Rental Agencies completed!")
 }
 
-async function seedCars() {
+async function seedCars(db) {
+  if (!(await isEmptyCollection(db, "cars"))) {
+    return
+  }
+  const batch = writeBatch(db)
+  const agency1Ref = doc(db, "users", "4Kwz0T4OpOvSsGmXQksv")
+  const agency2Ref = doc(db, "users", "WiA1f9MBL3wdhgC1tKX9")
   const vehicles = [
     {
       id: "1",
@@ -403,11 +467,31 @@ async function seedCars() {
       siege: 5,
     },
   ]
+  Promise.all(
+    vehicles.map((car) => {
+      const docRef = doc(collection(db, "cars"))
+      batch.set(docRef, { ...car, id: docRef.id, companyId: agency1Ref })
+    }),
+    vehicles.map((car) => {
+      const docRef = doc(collection(db, "cars"))
+      batch.set(docRef, { ...car, id: docRef.id, companyId: agency2Ref })
+    }),
+  )
+  await batch.commit()
 
-  console.log(vehicles)
+  console.log(
+    "Seeding Cars completed!",
+    "Cars linked to the agencies: ",
+    agency1Ref.id,
+    agency2Ref.id,
+  )
 }
 
-async function seedOrders() {
+async function seedOrders(db) {
+  if (!(await isEmptyCollection(db, "orders"))) {
+    return
+  }
+  const batch = writeBatch(db)
   const orders = [
     {
       id: "1",
@@ -570,15 +654,43 @@ async function seedOrders() {
       customerFirstName: "Laura",
     },
   ]
-
-  console.log(orders)
+  await Promise.all(
+    orders.map(async (order, index) => {
+      const docRef = doc(collection(db, "orders"))
+      const queryCustomers = query(
+        collection(db, "users"),
+        where("role", "==", "customer"),
+      )
+      const customersDocs = await getDocs(queryCustomers)
+      const customers = customersDocs.docs.map((doc) => ({
+        ...doc.data(),
+        ref: doc.ref,
+      }))
+      const queryCars = query(collection(db, "cars"), limit(10))
+      const carsDoc = await getDocs(queryCars)
+      const cars = carsDoc.docs.map((doc) => ({ ...doc.data(), ref: doc.ref }))
+      batch.set(docRef, {
+        ...order,
+        id: docRef.id,
+        customerId: customers[index].ref,
+        carId: cars[index].ref,
+        companyId: cars[index].companyId,
+        customerName: customers[index].name,
+        customerFirstName: customers[index].firstName,
+      })
+    }),
+  )
+  await batch.commit()
+  console.log("Seeding orders with success!")
 }
 
 async function main() {
-  await seedCustomers()
-  await seedCompanies()
-  await seedCars()
-  await seedOrders()
+  const { db } = await initFirebase()
+  await seedCustomers(db)
+  await seedCompanies(db)
+  await seedCars(db)
+  await seedOrders(db)
+  process.exit()
 }
 
 main().catch((err) => {
