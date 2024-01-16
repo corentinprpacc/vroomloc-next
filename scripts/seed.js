@@ -34,6 +34,19 @@ async function isEmptyCollection(db, collectionName) {
   return true
 }
 
+async function isEmptyCompanies(db) {
+  const queryCompanies = query(
+    collection(db, "users"),
+    where("role", "==", "company"),
+  )
+  const docs = await getDocs(queryCompanies)
+  if (docs.docs.length > 0) {
+    console.log(`[Error] La collection companies n'est pas vide`)
+    return false
+  }
+  return true
+}
+
 async function seedCustomers(db) {
   if (!(await isEmptyCollection(db, "users"))) {
     return
@@ -132,7 +145,7 @@ async function seedCustomers(db) {
 }
 
 async function seedCompanies(db) {
-  if (!(await isEmptyCollection(db, "users"))) {
+  if (!(await isEmptyCompanies(db))) {
     return
   }
   const batch = writeBatch(db)
