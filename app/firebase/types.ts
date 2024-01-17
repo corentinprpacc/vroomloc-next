@@ -33,6 +33,7 @@ export type Car = {
   siege: number
   weekEndPrice: number
   weekPrice: number
+  city: string
 }
 export type Order = {
   id: string

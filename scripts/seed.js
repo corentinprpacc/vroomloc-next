@@ -286,8 +286,15 @@ async function seedCars(db) {
     return
   }
   const batch = writeBatch(db)
-  const agency1Ref = doc(db, "users", "4Kwz0T4OpOvSsGmXQksv")
-  const agency2Ref = doc(db, "users", "WiA1f9MBL3wdhgC1tKX9")
+  const queryAgencies = query(
+    collection(db, "users"),
+    where("role", "==", "company"),
+  )
+  const agencies = await getDocs(queryAgencies)
+  const agency1Ref = agencies.docs[0].ref
+  const agency2Ref = agencies.docs[1].ref
+  const city1 = agencies.docs[0].data().city
+  const city2 = agencies.docs[1].data().city
   const vehicles = [
     {
       id: "1",
@@ -483,11 +490,21 @@ async function seedCars(db) {
   Promise.all(
     vehicles.map((car) => {
       const docRef = doc(collection(db, "cars"))
-      batch.set(docRef, { ...car, id: docRef.id, companyId: agency1Ref })
+      batch.set(docRef, {
+        ...car,
+        id: docRef.id,
+        companyId: agency1Ref,
+        city: city1,
+      })
     }),
     vehicles.map((car) => {
       const docRef = doc(collection(db, "cars"))
-      batch.set(docRef, { ...car, id: docRef.id, companyId: agency2Ref })
+      batch.set(docRef, {
+        ...car,
+        id: docRef.id,
+        companyId: agency2Ref,
+        city: city2,
+      })
     }),
   )
   await batch.commit()
