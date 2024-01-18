@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image"
 import { Car } from "../firebase/types"
+import Props from "../cars/page"
 import { storage } from "../firebase/config"
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage"
 
