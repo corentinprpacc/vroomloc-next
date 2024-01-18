@@ -7,7 +7,7 @@ import { Car } from "../firebase/types"
 
 interface Props {
   car: Car[]
-  onDataSend: (data: string) => void
+  onInputChange: (data: string) => void
 }
 
 const Cars: React.FC<Props> = ({ car }: Props) => {
