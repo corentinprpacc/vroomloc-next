@@ -5,12 +5,7 @@ import { getAllCars } from "../firebase/utils"
 import { useState, useEffect } from "react"
 import { Car } from "../firebase/types"
 
-interface Props {
-  car: Car[]
-  onInputChange: (data: string) => void
-}
-
-const Cars: React.FC<Props> = ({ car }: Props) => {
+export default function Cars() {
   const [cars, setCars] = useState<Car[]>()
   const [searchCity, setSearchCity] = useState<String>("")
 
@@ -45,5 +40,3 @@ const Cars: React.FC<Props> = ({ car }: Props) => {
     </>
   )
 }
-
-export default Cars
