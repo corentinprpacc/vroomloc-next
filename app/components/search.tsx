@@ -69,15 +69,6 @@ const Search: React.FC<Props> = ({ getCars, onInputChange }: Props) => {
 
   return (
     <div className="bg-black">
-      <ul>
-        {cities.map((city, id) => {
-          return (
-            <li key={id} className="text-white">
-              {city}
-            </li>
-          )
-        })}
-      </ul>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="container sm:max-md:pt-6 md:flex md:justify-between"
