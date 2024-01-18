@@ -1,9 +1,9 @@
 import { auth } from "@/auth"
-import LoginForm from "@/components/ui/LoginForm"
+import RegisterForm from "@/components/ui/RegisterForm"
 import { redirect } from "next/navigation"
 import React from "react"
 
-export default async function Login() {
+export default async function Register() {
   const session = await auth()
   if (session?.user) {
     if (!session?.user.role) {
@@ -14,10 +14,10 @@ export default async function Login() {
   return (
     <div className="min-h-screen bg-black pt-8">
       <h1 className="text-4xl font-bold text-center text-white">
-        Agence - Connexion
+        Agence - Création
       </h1>
       <div className="mt-16">
-        <LoginForm />
+        <RegisterForm />
       </div>
     </div>
   )
