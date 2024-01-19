@@ -38,7 +38,7 @@ export default function RegisterForm() {
           await signInWithGoogle()
         }}
       >
-        <div className="w-1/3 px-6">
+        <div className="lg:w-1/3 md:w-2/3 w-full px-6">
           <Button
             variant="outline"
             className="w-full flex gap-4 items-center relative"
@@ -52,8 +52,8 @@ export default function RegisterForm() {
         className="mt-8 flex flex-col items-center"
         onSubmit={handleSubmit(proccessForm)}
       >
-        <div className="flex-1 flex flex-col w-2/3 items-center rounded-lg px-6">
-          <div className="w-full flex justify-center gap-16">
+        <div className="flex-1 flex flex-col md:w-2/3 w-full items-center rounded-lg px-6">
+          <div className="w-full flex sm:flex-row flex-col justify-center sm:gap-16">
             <div className="w-full">
               <div>
                 <Label htmlFor="name" className="text-white">
@@ -153,7 +153,7 @@ export default function RegisterForm() {
               </div>
             </div>
             <div className="w-full">
-              <div>
+              <div className="mt-4 sm:mt-0">
                 <Label htmlFor="street" className="text-white">
                   Adresse
                 </Label>
@@ -236,7 +236,7 @@ export default function RegisterForm() {
                 <div className="relative">
                   <Input
                     className="bg-black text-white"
-                    id="password"
+                    id="confirmPassword"
                     type="password"
                     placeholder="Confirmez votre mot de passe"
                     required

@@ -5,6 +5,13 @@ export default NextAuth(authConfig).auth((req) => {
   const isLoggedIn = !!req.auth
   const user = req.auth?.user
   const { nextUrl } = req
+  if (isLoggedIn && !user) {
+    if (process.env.NODE_ENV === "development") {
+      throw new Error("Not able to fetch firebase database")
+    } else {
+      return Response.redirect(new URL("/", nextUrl))
+    }
+  }
   if (nextUrl.pathname.includes("/agency")) {
     const authRoutes = ["/agency/login", "/agency/register"]
     const moreInfosRoute = "/agency/more-infos"

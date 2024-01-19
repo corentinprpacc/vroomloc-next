@@ -7,6 +7,7 @@ import { FirestoreAdapter } from "@auth/firebase-adapter"
 import { cert } from "firebase-admin/app"
 import * as bcrypt from "bcryptjs"
 import { getUserByEmail } from "./app/firebase/utils"
+import { getEnv } from "./lib/utils"
 
 export const {
   signIn,
@@ -17,9 +18,9 @@ export const {
   ...authConfig,
   adapter: FirestoreAdapter({
     credential: cert({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
+      projectId: getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
+      clientEmail: getEnv("FIREBASE_CLIENT_EMAIL"),
+      privateKey: getEnv("FIREBASE_PRIVATE_KEY")!.replace(/\\n/g, "\n"),
     }),
   }),
   session: { strategy: "jwt" },
@@ -40,8 +41,8 @@ export const {
       },
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: getEnv("GOOGLE_CLIENT_ID"),
+      clientSecret: getEnv("GOOGLE_CLIENT_SECRET"),
       allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
@@ -52,5 +53,5 @@ export const {
       },
     }),
   ],
-  secret: process.env.AUTH_SECRET,
+  secret: getEnv("AUTH_SECRET"),
 })
