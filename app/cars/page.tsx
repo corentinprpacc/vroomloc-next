@@ -25,7 +25,7 @@ export default function Cars() {
   return (
     <>
       <Search getCars={cars} onInputChange={handleInputChange} />
-      <div className="container">
+      <div className="container relative -z-10">
         <p className="text-center my-4">Résultats</p>
         <div className="flex cards-block flex-wrap">
           {cars
