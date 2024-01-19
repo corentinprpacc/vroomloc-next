@@ -36,7 +36,7 @@ export default function LoginForm() {
         className="flex flex-col items-center mt-2"
         onSubmit={handleSubmit(proccessForm)}
       >
-        <div className="flex-1 flex flex-col w-1/3 items-center rounded-lg px-6">
+        <div className="flex-1 flex flex-col lg:w-1/3 sm:w-2/3 w-full items-center rounded-lg px-6">
           <div className="w-full">
             <div>
               <Label htmlFor="email" className="text-white">
@@ -95,7 +95,7 @@ export default function LoginForm() {
           await signInWithGoogle()
         }}
       >
-        <div className="w-1/3 px-6">
+        <div className="lg:w-1/3 sm:w-2/3 w-full px-6">
           <Button
             variant="outline"
             className="w-full flex gap-4 items-center relative"
