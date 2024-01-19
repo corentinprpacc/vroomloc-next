@@ -1,10 +1,10 @@
-import { getDocs, query, where } from "firebase/firestore"
+import { getDocs, query, where, DocumentReference } from "firebase/firestore"
 import {
   carsCollection,
   ordersCollection,
   usersCollection,
 } from "./collections"
-import { Car, Customer, Order, RentalAgency } from "./types"
+import { Car, Customer, Order, RentalAgency, User } from "./types"
 
 export const getAllCustomers = async (): Promise<Customer[]> => {
   const queryCustomers = query(usersCollection, where("role", "==", "customer"))
@@ -34,4 +34,30 @@ export const getAllOrders = async (): Promise<Order[]> => {
   return ordersDocs.docs.map((doc) => ({
     ...(doc.data() as Order),
   }))
+}
+
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+  const queryUser = query(usersCollection, where("email", "==", email))
+  const docsUser = await getDocs(queryUser)
+  if (docsUser.docs.length === 0) {
+    return null
+  }
+  const usersMap = docsUser.docs.map((doc) => {
+    return { ...doc.data() }
+  })
+  return usersMap[0] as User
+}
+
+export const getUserRefByEmail = async (
+  email: string,
+): Promise<DocumentReference | null> => {
+  const queryUser = query(usersCollection, where("email", "==", email))
+  const docsUser = await getDocs(queryUser)
+  if (docsUser.docs.length === 0) {
+    return null
+  }
+  const usersMap = docsUser.docs.map((doc) => {
+    return doc.ref
+  })
+  return usersMap[0]
 }

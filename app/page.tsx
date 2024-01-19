@@ -1,3 +1,3 @@
 export default function Home() {
-  return <main>Vroom Loc</main>
+  return <main>Vroomloc</main>
 }
