@@ -1,23 +1,18 @@
-import { auth } from "@/auth"
 import RegisterForm from "@/components/ui/RegisterForm"
-import { redirect } from "next/navigation"
+import Link from "next/link"
 import React from "react"
 
 export default async function Register() {
-  const session = await auth()
-  if (session?.user) {
-    if (!session?.user.role) {
-      redirect("/more-infos")
-    }
-    redirect("/")
-  }
   return (
-    <div className="min-h-screen bg-black pt-8">
+    <div className="min-h-screen bg-black pt-6">
       <h1 className="text-4xl font-bold text-center text-white">
         Agence - Création
       </h1>
-      <div className="mt-16">
+      <div className="mt-8">
         <RegisterForm />
+      </div>
+      <div className="mt-4 text-white text-center underline font-light">
+        <Link href="/agency/login">Déjà enregistré ? Connectez-vous ici</Link>
       </div>
     </div>
   )

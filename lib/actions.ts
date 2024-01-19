@@ -51,7 +51,7 @@ export async function addMoreInfos(data: InputMoreInfos) {
         role: "company",
       })
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      redirect("/")
+      redirect("/agency")
     }
   } else {
     return false

@@ -4,17 +4,10 @@ import { getUserByEmail } from "./app/firebase/utils"
 
 export const authConfig = {
   pages: {
-    signIn: "/login",
+    signIn: "/agency/login",
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      //   const isLoggedIn = !!auth?.user
-      //   const isOnAuthPages =
-      //     nextUrl.pathname.toString() === "/login" ||
-      //     nextUrl.pathname.toString() === "/register"
-      //   if (isLoggedIn && isOnAuthPages) {
-      //     return Response.redirect(new URL("/", nextUrl))
-      //   }
       return true
     },
     jwt({ token, user }) {
