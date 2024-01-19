@@ -31,6 +31,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@hookform/devtools": "^4.3.1",
     "@types/node": "^20",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",

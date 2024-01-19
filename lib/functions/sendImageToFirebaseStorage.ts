@@ -17,6 +17,8 @@ const sendImageToFirebaseStorage = async (image: any) => {
 
     const downloadURL = await getDownloadURL(storageRef)
 
+    return downloadURL
+
     console.log("image uploadé avec succes", downloadURL)
   } catch (error) {
     console.error("Erreur lors de l'upload de l'image :", error)

@@ -87,3 +87,5 @@ export async function register(data: InputRegister) {
     return false
   }
 }
+
+export async function addNewCar() {}
