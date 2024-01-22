@@ -6,9 +6,7 @@ export default async function Login() {
       <h1 className="text-4xl font-bold text-center text-white">
         Agence - Connexion
       </h1>
-      <div className="mt-16">
-        <polide />
-      </div>
+      <div className="mt-16"></div>
       <div className="mt-8 text-white text-center underline font-light">
         <Link href="/agency/register">
           Pas encore enregistré ? Inscrivez-vous ici
