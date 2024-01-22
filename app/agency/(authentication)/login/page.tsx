@@ -1,6 +1,4 @@
-import LoginForm from "@/components/ui/LoginForm"
 import Link from "next/link"
-import React from "react"
 
 export default async function Login() {
   return (
@@ -9,7 +7,7 @@ export default async function Login() {
         Agence - Connexion
       </h1>
       <div className="mt-16">
-        <LoginForm />
+        <polide />
       </div>
       <div className="mt-8 text-white text-center underline font-light">
         <Link href="/agency/register">

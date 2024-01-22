@@ -1,24 +1,31 @@
 "use server"
 
+import {
+  carsCollection,
+  carsTargetedDocument,
+  usersCollection,
+} from "@/app/firebase/collections"
 import { getUserRefByEmail } from "@/app/firebase/utils"
 import { auth, signIn, signOut } from "@/auth"
+import * as bcrypt from "bcryptjs"
 import { addDoc, updateDoc } from "firebase/firestore"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import {
+  AddCarFormSchema,
   LoginFormSchema,
   MoreInfosFormSchema,
   RegisterFormSchema,
 } from "./schema"
-import { usersCollection } from "@/app/firebase/collections"
-import * as bcrypt from "bcryptjs"
 
 type InputsLogin = z.infer<typeof LoginFormSchema>
 
 type InputRegister = z.infer<typeof RegisterFormSchema>
 
 type InputMoreInfos = z.infer<typeof MoreInfosFormSchema>
+
+type AddCarFormType = z.infer<typeof AddCarFormSchema>
 
 export async function authenticate(data: InputsLogin) {
   const result = LoginFormSchema.safeParse(data)
@@ -88,4 +95,22 @@ export async function register(data: InputRegister) {
   }
 }
 
-export async function addNewCar() {}
+export async function addNewCar(data: AddCarFormType) {
+  const result = AddCarFormSchema.safeParse(data)
+  console.log("result add car", result)
+  if (result.success) {
+    const response = await addDoc(carsCollection, {
+      ...data,
+      carId: "789",
+    })
+
+    await updateDoc(carsTargetedDocument(response.id), {
+      carId: response.id,
+    })
+    console.log("respooonse id", response.id)
+
+    return true
+  } else {
+    return false
+  }
+}

@@ -1,42 +1,25 @@
-import isThisStringContainOnlyNumbers from "@/lib/functions/isThisStringContainOnlyNumbers"
-import React from "react"
+import * as React from "react"
 
-interface InputProps {
-  field: any
-  label: string
-  maxLength: string
-  errors: any
-}
+import { cn } from "@/lib/utils"
 
-const Input: React.FC<InputProps> = ({ field, label, maxLength, errors }) => {
-  return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={field.name}>{label}</label>
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
       <input
-        maxLength={maxLength}
-        {...field}
-        type="text"
-        className="border"
-        placeholder={label}
-        onChange={(e) => {
-          if (e.target.value) {
-            const contientUniquementNombres = isThisStringContainOnlyNumbers(
-              e.target.value,
-            )
-
-            if (contientUniquementNombres) {
-              field.onChange(e.target.value)
-            }
-          } else {
-            field.onChange(undefined)
-          }
-        }}
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300",
+          className,
+        )}
+        ref={ref}
+        {...props}
       />
-      {errors[field.name] && (
-        <p className="text-red-400">{errors[field.name]?.message}</p>
-      )}
-    </div>
-  )
-}
+    )
+  },
+)
+Input.displayName = "Input"
 
-export default Input
+export { Input }

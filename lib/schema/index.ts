@@ -46,3 +46,34 @@ export const RegisterFormSchema = MoreInfosFormSchema.and(LoginFormSchema)
     message: "Les deux mots de passe ne sont pas égaux",
     path: ["password"],
   })
+
+export const AddCarFormSchema = z.object({
+  brand: z.string().min(1, { message: "Veuillez saisir un model" }),
+  model: z.string().min(1, { message: "Veuillez saisir un carId correct" }),
+  imageUrl: z.any(),
+  carYear: z.string().min(1, { message: "Veuillez saisir une année correct" }),
+  dayPrice: z.number().gt(2, { message: "Veuillez saisir un tarif 24h" }),
+  weekPrice: z
+    .number()
+    .gt(0, { message: "Veuillez saisir un tarif semaine 7j" }),
+  weekEndPrice: z
+    .number()
+    .gt(0, { message: "Veuillez saisir un tarif week end" }),
+  horsePower: z.number().gt(0, { message: "Veuillez saisir une puissance" }),
+  fuelType: z.string().min(1, { message: "Veuillez saisir un carburant" }),
+  rentDeposit: z
+    .number()
+    .gt(0, { message: "Veuillez saisir un montant de caution" }),
+  kilometerAllowed: z
+    .number()
+    .gt(0, { message: "Veuillez saisir le nombre de kilomètre autorisé" }),
+  engineType: z
+    .string()
+    .min(1, { message: "Veuillez saisir un type de moteur" }),
+  description: z
+    .string()
+    .min(4, { message: "Veuillez saisir une description" }),
+  numberOfSeat: z
+    .string()
+    .min(1, { message: "Veuillez saisir le nombre de place" }),
+})

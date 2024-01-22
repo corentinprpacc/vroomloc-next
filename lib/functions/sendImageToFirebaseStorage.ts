@@ -1,5 +1,6 @@
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage"
 import currentDateTimestamp from "./convertDateToTimestamp"
+import "../../app/firebase/config"
 
 const sendImageToFirebaseStorage = async (image: any) => {
   try {

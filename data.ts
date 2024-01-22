@@ -1,3 +1,7 @@
+type AllCarModelType = {
+  [key: string]: string[]
+}
+
 export const carFuel = ["Essence", "Diesel", "Electrique", "Hybride"]
 export const carEngine = ["Automatique", "Manuel", "Hybride"]
 export const carType = [
@@ -10,6 +14,28 @@ export const carType = [
   "Cabriolet",
   "Espace",
   "Pick-up",
+]
+export const numberOfSeat = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
 ]
 
 export const carYear = [
@@ -80,8 +106,8 @@ export const allCarBrand = [
   "Volvo",
   "Autre",
 ]
-
-export const allCarModel = {
+export const carModels = { Audi: ["hello"] }
+export const allCarModel: AllCarModelType = {
   Audi: [
     "S1",
     "S3",
@@ -310,7 +336,6 @@ export const allCarModel = {
     "Gle",
     "Gle Coupe",
     "Gls",
-    "AMG C43",
     "AMG C63",
     "AMG C63 S",
     "AMG CLA 35",
@@ -319,7 +344,6 @@ export const allCarModel = {
     "AMG CLS 63",
     "AMG CLK 63 Black Series",
     "AMG CLS 53",
-    "AMG CLA 45",
     "AMG C43",
     "AMG E43",
     "AMG E53",
@@ -336,7 +360,6 @@ export const allCarModel = {
     "AMG SLS GT",
     "AMG A45",
     "AMG A45 S",
-    "AMG GLC 63",
     "AMG G 55",
     "AMG G 63",
     "AMG G 65",
