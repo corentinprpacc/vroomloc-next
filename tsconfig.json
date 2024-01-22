@@ -6,6 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
+    "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -33,7 +34,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/addCarPage/page.jsx"
+    "app/addCarPage/page.jsx",
+    "data.js"
   ],
   "exclude": [
     "node_modules"

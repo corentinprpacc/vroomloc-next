@@ -34,8 +34,6 @@ function AddCarForm() {
   })
 
   const brandField = watch("brand")
-  const formWatch = watch()
-  const imageUrlField = watch("imageUrl")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {
     const dataSent = { ...data, imageUrl: carImageUrl }
