@@ -33,7 +33,6 @@ const Search: React.FC<Props> = ({ getCars, onInputChange }: Props) => {
   const [cities, setCities] = useState<string[]>([])
   const [cityInput, setCityInput] = useState("")
   const [showCities, setShowCities] = useState(false)
-  const [filteredCities, setFilteredCities] = useState<string[]>([])
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
   const onSubmit = (data: FormValues) => console.log(data)
@@ -60,10 +59,6 @@ const Search: React.FC<Props> = ({ getCars, onInputChange }: Props) => {
   }, [formState, data, isValidating])
 
   useEffect(() => {
-    setFilteredCities(cities)
-  }, [cities])
-
-  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
         setShowCities(false)
@@ -77,24 +72,13 @@ const Search: React.FC<Props> = ({ getCars, onInputChange }: Props) => {
     }
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
+  const handleInputChange = (inputValue: string) => {
     setCityInput(inputValue)
     onInputChange(inputValue)
-    setFilteredCities(
-      cities.filter((city) =>
-        city.toLowerCase().includes(inputValue.toLowerCase()),
-      ),
-    )
   }
 
   const handleInputClick = () => {
     setShowCities(true)
-  }
-
-  const handleSuggestionClick = (city: string) => {
-    setCityInput(city)
-    setShowCities(false)
   }
 
   const handleRemoveSearch = () => {
@@ -128,7 +112,7 @@ const Search: React.FC<Props> = ({ getCars, onInputChange }: Props) => {
             className="w-full bg-black text-[#c2c2c2] p-4"
             value={cityInput}
             ref={inputRef}
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e.target.value)}
             onClick={handleInputClick}
           />
           {cityInput && (
@@ -156,11 +140,11 @@ const Search: React.FC<Props> = ({ getCars, onInputChange }: Props) => {
           />
           {showCities && (
             <ul className="absolute bg-black opacity-85 w-full text-white px-4 pt-4 top-16 z-10">
-              {filteredCities.map((city, index) => (
+              {cities.map((city, index) => (
                 <li
                   key={index}
                   className="pb-4"
-                  onClick={() => handleSuggestionClick(city)}
+                  onClick={() => handleInputChange(city)}
                 >
                   {city}
                 </li>
