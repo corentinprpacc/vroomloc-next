@@ -20,7 +20,7 @@ import { Button } from "./button"
 
 type FormType = z.infer<typeof AddCarFormSchema>
 
-function AddCarForm() {
+function AddCarForm({ currentUserId }: any) {
   const [carImageUrl, setCarImageUrl] = useState("")
   const {
     register,
@@ -31,7 +31,12 @@ function AddCarForm() {
     formState: { errors, isSubmitted },
   } = useForm<FormType>({
     resolver: zodResolver(AddCarFormSchema),
+    defaultValues: {
+      userId: currentUserId,
+    },
   })
+
+  const formValues = watch()
 
   const brandField = watch("brand")
 
@@ -244,8 +249,6 @@ function AddCarForm() {
                 placeholder="Tarif semaine"
                 onChange={(e) => {
                   const numberField = e.target.value
-
-                  console.log("week type value", typeof numberField)
 
                   if (numberField.length < 7) {
                     setValue("weekPrice", parseFloat(numberField))

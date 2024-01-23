@@ -22,7 +22,10 @@ export function SelectScrollable({
 }: SelectScrollableType) {
   return (
     <Select onValueChange={field.onChange} disabled={disabled}>
-      <SelectTrigger className="w-[280px] bg-black text-white">
+      <SelectTrigger
+        className="w-[280px] bg-black text-white
+       "
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

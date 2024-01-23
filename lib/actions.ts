@@ -3,6 +3,7 @@
 import {
   carsCollection,
   carsTargetedDocument,
+  userTargetedDocument,
   usersCollection,
 } from "@/app/firebase/collections"
 import { getUserRefByEmail } from "@/app/firebase/utils"
@@ -81,11 +82,15 @@ export async function register(data: InputRegister) {
     const { confirmPassword, password, ...userData } = result.data
     // Encrypt password
     const passwordCrypt = (await bcrypt.hash(data.password, 10)) as string
-    await addDoc(usersCollection, {
+    const response = await addDoc(usersCollection, {
       ...userData,
       password: passwordCrypt,
       role: "company",
     })
+    await updateDoc(userTargetedDocument(response.id), {
+      id: response.id,
+    })
+
     await signIn("credentials", {
       email: userData.email,
       password,
@@ -97,7 +102,7 @@ export async function register(data: InputRegister) {
 
 export async function addNewCar(data: AddCarFormType) {
   const result = AddCarFormSchema.safeParse(data)
-  console.log("result add car", result)
+
   if (result.success) {
     const response = await addDoc(carsCollection, {
       ...data,
@@ -107,7 +112,6 @@ export async function addNewCar(data: AddCarFormType) {
     await updateDoc(carsTargetedDocument(response.id), {
       carId: response.id,
     })
-    console.log("respooonse id", response.id)
 
     return true
   } else {

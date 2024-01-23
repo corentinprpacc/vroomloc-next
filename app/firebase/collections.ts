@@ -8,3 +8,7 @@ export const ordersCollection = collection(db, "orders")
 export const carsTargetedDocument = (documentId: string) => {
   return doc(db, "cars", documentId)
 }
+
+export const userTargetedDocument = (documentId: string) => {
+  return doc(db, "users", documentId)
+}
