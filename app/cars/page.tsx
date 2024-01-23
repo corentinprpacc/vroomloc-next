@@ -1,42 +1,15 @@
-"use client"
-import CardCar from "../components/card-car"
-import Search from "../components/search"
+import CardCar from "../../components/ui/card-car"
+import Search from "../../components/ui/SearchCarsListForm"
 import { getAllCars } from "../firebase/utils"
 import { useState, useEffect } from "react"
 import { Car } from "../firebase/types"
+import CarsList from "@/components/ui/cars-list"
 
-export default function Cars() {
-  const [cars, setCars] = useState<Car[]>()
-  const [searchCity, setSearchCity] = useState<String>("")
-
-  useEffect(() => {
-    async function getCars() {
-      const data = await getAllCars()
-      setCars(data)
-    }
-
-    getCars()
-  }, [])
-
-  const handleInputChange = (inputValue: string) => {
-    setSearchCity(inputValue)
-  }
-
+export default async function Cars() {
+  const data = await getAllCars()
   return (
     <>
-      <Search getCars={cars} onInputChange={handleInputChange} />
-      <div className="container relative -z-10">
-        <p className="text-center my-4">Résultats</p>
-        <div className="flex cards-block flex-wrap">
-          {cars
-            ?.filter((car) =>
-              car.city.toLowerCase().includes(searchCity?.toLowerCase()),
-            )
-            .map((filteredCar, id) => (
-              <CardCar key={id} getCar={filteredCar} />
-            ))}
-        </div>
-      </div>
+      <CarsList />
     </>
   )
 }
