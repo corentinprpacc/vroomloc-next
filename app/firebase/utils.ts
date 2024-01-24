@@ -1,10 +1,24 @@
-import { getDocs, query, where, DocumentReference } from "firebase/firestore"
+import {
+  getDocs,
+  query,
+  where,
+  DocumentReference,
+  Timestamp,
+} from "firebase/firestore"
 import {
   carsCollection,
   ordersCollection,
+  updateUserDataCollection,
   usersCollection,
 } from "./collections"
-import { Car, Customer, Order, RentalAgency, User } from "./types"
+import {
+  Car,
+  Customer,
+  Order,
+  RentalAgency,
+  UpdateUserData,
+  User,
+} from "./types"
 
 export const getAllCustomers = async (): Promise<Customer[]> => {
   const queryCustomers = query(usersCollection, where("role", "==", "customer"))
@@ -60,4 +74,29 @@ export const getUserRefByEmail = async (
     return doc.ref
   })
   return usersMap[0]
+}
+
+type updateUserReturn = {
+  ref: DocumentReference
+  data: UpdateUserData
+}
+
+export const getUpdateUserDataByEmail = async (
+  email: string,
+): Promise<updateUserReturn | null> => {
+  const queryUpdateUser = query(
+    updateUserDataCollection,
+    where("email", "==", email),
+  )
+  const docsUpdateUser = await getDocs(queryUpdateUser)
+  if (docsUpdateUser.docs.length === 0) return null
+  const updateUsersMap = docsUpdateUser.docs.map((doc) => {
+    return { ref: doc.ref, data: doc.data() }
+  })
+  return updateUsersMap[0] as updateUserReturn
+}
+
+export const checkUpdateSessionIsExpired = (date: Timestamp): boolean => {
+  const userDate = new Date(date.toDate())
+  return userDate < new Date()
 }

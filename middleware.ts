@@ -1,8 +1,14 @@
 import NextAuth from "next-auth"
 import { authConfig } from "./auth.config"
+import {
+  checkUpdateSessionIsExpired,
+  getUpdateUserDataByEmail,
+} from "./app/firebase/utils"
+import { deleteDoc } from "firebase/firestore"
 
-export default NextAuth(authConfig).auth((req) => {
-  const isLoggedIn = !!req.auth
+export default NextAuth(authConfig).auth(async (req) => {
+  const isLoggedIn = !!req.auth && !!req.auth.user
+  // console.log(req.auth)
   const user = req.auth?.user
   const { nextUrl } = req
   if (isLoggedIn && !user) {
@@ -32,6 +38,38 @@ export default NextAuth(authConfig).auth((req) => {
       nextUrl.pathname !== moreInfosRoute
     ) {
       return Response.redirect(new URL("/agency/more-infos", nextUrl))
+    }
+  }
+  if (nextUrl.pathname.includes("/agency/profile/edit/sensitive")) {
+    const updateUserData = await getUpdateUserDataByEmail(user?.email || "")
+    if (updateUserData) {
+      const isTokenExpired = checkUpdateSessionIsExpired(
+        updateUserData?.data.expiresAt,
+      )
+      if (
+        isTokenExpired &&
+        nextUrl.pathname === "/agency/profile/edit/sensitive"
+      ) {
+        // TODO Remove document
+        await deleteDoc(updateUserData.ref)
+        return Response.redirect(
+          new URL("/agency/profile/edit/sensitive/confirm", nextUrl),
+        )
+      }
+      if (
+        !isTokenExpired &&
+        nextUrl.pathname === "/agency/profile/edit/sensitive/confirm"
+      ) {
+        return Response.redirect(
+          new URL("/agency/profile/edit/sensitive", nextUrl),
+        )
+      }
+    } else {
+      if (nextUrl.pathname === "/agency/profile/edit/sensitive") {
+        return Response.redirect(
+          new URL("/agency/profile/edit/sensitive/confirm", nextUrl),
+        )
+      }
     }
   }
 })

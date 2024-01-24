@@ -10,16 +10,32 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       return true
     },
-    jwt({ token, user }) {
-      if (user) token.user = user as User
+    jwt({ token, user, trigger, session }: any) {
+      // console.log("Token load: ", token)
+      if (trigger === "update") {
+        if (session.email) {
+          // Todo Data verification on server
+          token.user.email = session.email
+        } else if (session.moreInfos) {
+          // Data verification on the server
+          token.user = { ...token.user, ...session.moreInfos, role: "company" }
+        } else if (session.editGeneralInfos) {
+          token.user = { ...token.user, ...session.editGeneralInfos }
+        }
+        return token
+      }
+      if (user) {
+        const { password, ...userData } = user
+        token.user = userData as User
+      }
       return token
     },
     async session({ token, session }: any) {
-      if (!session.user.role) {
-        const userFromDb = await getUserByEmail(session.user.email)
-        session.user = userFromDb as RentalAgency
-        return session
-      }
+      // if (!token.user.role) {
+      //   const userFromDb = await getUserByEmail(session.user.email)
+      //   session.user = userFromDb as RentalAgency
+      //   return session
+      // }
       session.user = token.user as RentalAgency
       return session
     },
