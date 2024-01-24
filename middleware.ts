@@ -6,30 +6,37 @@ import {
 } from "./app/firebase/utils"
 import { deleteDoc } from "firebase/firestore"
 
+const authRoutes = ["/agency/login", "/agency/register"]
+const moreInfosRoute = "/agency/more-infos"
+const agencyPath = "/agency"
+const sensitivePath = "/agency/profile/edit/sensitive"
+const sensitiveConfirmPath = "/agency/profile/edit/sensitive/confirm"
+
 export default NextAuth(authConfig).auth(async (req) => {
   const isLoggedIn = !!req.auth && !!req.auth.user
-  // console.log(req.auth)
   const user = req.auth?.user
   const { nextUrl } = req
+  const redirect = (url: string) => {
+    return Response.redirect(new URL(url, nextUrl))
+  }
   if (isLoggedIn && !user) {
     if (process.env.NODE_ENV === "development") {
       throw new Error("Not able to fetch firebase database")
     } else {
-      return Response.redirect(new URL("/", nextUrl))
+      console.error("Error Fetching Firebase Firestore Data")
+      return redirect("/")
     }
   }
-  if (nextUrl.pathname.includes("/agency")) {
-    const authRoutes = ["/agency/login", "/agency/register"]
-    const moreInfosRoute = "/agency/more-infos"
+  if (nextUrl.pathname.includes(agencyPath)) {
     if (
       isLoggedIn &&
       (authRoutes.includes(nextUrl.pathname) ||
         (nextUrl.pathname === moreInfosRoute && user?.role))
     ) {
-      return Response.redirect(new URL("/agency", nextUrl))
+      return redirect(agencyPath)
     }
     if (!isLoggedIn && !authRoutes.includes(nextUrl.pathname)) {
-      return Response.redirect(new URL("/agency/login", nextUrl))
+      return redirect("/agency/login")
     }
     if (
       isLoggedIn &&
@@ -37,38 +44,26 @@ export default NextAuth(authConfig).auth(async (req) => {
       nextUrl.pathname.includes("/agency") &&
       nextUrl.pathname !== moreInfosRoute
     ) {
-      return Response.redirect(new URL("/agency/more-infos", nextUrl))
+      return redirect("/agency/more-infos")
     }
   }
-  if (nextUrl.pathname.includes("/agency/profile/edit/sensitive")) {
+  if (nextUrl.pathname.includes(sensitivePath)) {
     const updateUserData = await getUpdateUserDataByEmail(user?.email || "")
     if (updateUserData) {
       const isTokenExpired = checkUpdateSessionIsExpired(
         updateUserData?.data.expiresAt,
       )
-      if (
-        isTokenExpired &&
-        nextUrl.pathname === "/agency/profile/edit/sensitive"
-      ) {
+      if (isTokenExpired && nextUrl.pathname === sensitivePath) {
         // TODO Remove document
         await deleteDoc(updateUserData.ref)
-        return Response.redirect(
-          new URL("/agency/profile/edit/sensitive/confirm", nextUrl),
-        )
+        return redirect(sensitiveConfirmPath)
       }
-      if (
-        !isTokenExpired &&
-        nextUrl.pathname === "/agency/profile/edit/sensitive/confirm"
-      ) {
-        return Response.redirect(
-          new URL("/agency/profile/edit/sensitive", nextUrl),
-        )
+      if (!isTokenExpired && nextUrl.pathname === sensitiveConfirmPath) {
+        return redirect(sensitivePath)
       }
     } else {
-      if (nextUrl.pathname === "/agency/profile/edit/sensitive") {
-        return Response.redirect(
-          new URL("/agency/profile/edit/sensitive/confirm", nextUrl),
-        )
+      if (nextUrl.pathname === sensitivePath) {
+        return redirect(sensitiveConfirmPath)
       }
     }
   }

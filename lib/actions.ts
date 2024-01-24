@@ -65,6 +65,7 @@ export async function addMoreInfos(data: InputMoreInfos) {
       await updateDoc(userInDb, {
         ...data,
         role: "company",
+        id: session?.user.id,
       })
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
@@ -89,11 +90,12 @@ export async function register(data: InputRegister) {
     const { confirmPassword, password, ...userData } = result.data
     // Encrypt password
     const passwordCrypt = (await bcrypt.hash(data.password, 10)) as string
-    await addDoc(usersCollection, {
+    const doc = await addDoc(usersCollection, {
       ...userData,
       password: passwordCrypt,
       role: "company",
     })
+    await updateDoc(doc, { id: doc.id })
     await signIn("credentials", {
       email: userData.email,
       password,
