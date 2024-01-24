@@ -46,3 +46,9 @@ export const RegisterFormSchema = MoreInfosFormSchema.and(LoginFormSchema)
     message: "Les deux mots de passe ne sont pas égaux",
     path: ["password"],
   })
+
+export const SearchFormSchema = z.object({
+  city: z.string().min(1, { message: "Veuillez saisir la ville de l'agence" }),
+  startDate: z.date(),
+  endDate: z.date(),
+})

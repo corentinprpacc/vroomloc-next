@@ -10,6 +10,7 @@ import {
   LoginFormSchema,
   MoreInfosFormSchema,
   RegisterFormSchema,
+  SearchFormSchema,
 } from "./schema"
 import { usersCollection } from "@/app/firebase/collections"
 import * as bcrypt from "bcryptjs"
@@ -19,6 +20,8 @@ type InputsLogin = z.infer<typeof LoginFormSchema>
 type InputRegister = z.infer<typeof RegisterFormSchema>
 
 type InputMoreInfos = z.infer<typeof MoreInfosFormSchema>
+
+type InputSearch = z.infer<typeof SearchFormSchema>
 
 export async function authenticate(data: InputsLogin) {
   const result = LoginFormSchema.safeParse(data)
@@ -83,6 +86,15 @@ export async function register(data: InputRegister) {
       email: userData.email,
       password,
     })
+  } else {
+    return false
+  }
+}
+
+export async function searchForm(data: InputSearch) {
+  const result = SearchFormSchema.safeParse(data)
+  if (result.success) {
+    // doing something
   } else {
     return false
   }
