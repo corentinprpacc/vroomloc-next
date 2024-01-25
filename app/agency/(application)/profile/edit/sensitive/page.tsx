@@ -2,8 +2,6 @@ import UpdateEmailForm from "@/components/ui/forms/sensitive/UpdateEmailForm"
 import UpdatePasswordForm from "@/components/ui/forms/sensitive/UpdatePasswordForm"
 
 export default async function page() {
-  //   // TODO Create Sensitive data Page
-  //   // TODO Check security for user
   return (
     <div className="flex flex-col items-center w-full gap-8">
       <div className="w-full flex flex-col gap-4 items-center">

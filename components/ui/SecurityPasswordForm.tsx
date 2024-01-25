@@ -6,7 +6,7 @@ import { Button } from "./button"
 import { Input } from "./input"
 import { useState } from "react"
 import Loader from "./Loader"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 type InputPassword = {
   password: string
@@ -22,7 +22,7 @@ export default function SecurityPasswordForm() {
     setError("")
     const result = await confirmSecurityPassword(data)
     if (result && result.type === "error") {
-      setError("Incorrect Password.")
+      setError("Mot de passe incorrect.")
     }
     setIsLoading(false)
   }
@@ -35,7 +35,7 @@ export default function SecurityPasswordForm() {
         <Input
           type="password"
           disabled={isLoading}
-          placeholder="Enter your current password to access"
+          placeholder="Saisissez votre mot de passe actuel"
           {...register("password")}
           required
         />
@@ -44,7 +44,7 @@ export default function SecurityPasswordForm() {
           disabled={isLoading}
           className="text-black w-full mt-4"
         >
-          {!isLoading ? <span>Confirm</span> : <Loader className="w-8 h-8" />}
+          {!isLoading ? <span>Confirmez</span> : <Loader className="w-8 h-8" />}
         </Button>
         {error ? (
           <p className="bg-red-100 p-2 mt-4 rounded-md text-red-700">{error}</p>
@@ -56,7 +56,7 @@ export default function SecurityPasswordForm() {
         className="mt-8 w-full sm:w-1/3"
         disabled={isLoading}
       >
-        Cancel
+        Annuler
       </Button>
     </>
   )
