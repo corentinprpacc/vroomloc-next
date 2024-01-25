@@ -13,9 +13,9 @@ export default function Home() {
         </div>
       </div>
       <div className="absolute top-0 w-auto h-auto -z-10 brightness-50">
-        <video autoPlay playsInline loop>
-          <source src="/landing.mp4" type="video/mp4"></source>
-          Your browser does not support the video tag.
+        <video playsInline loop autoPlay muted preload="auto">
+          <source src={"/videos/landing.mp4"} type="video/mp4"></source>
+          Le navigateur ne supporte pas les vidéos
         </video>
       </div>
     </main>
