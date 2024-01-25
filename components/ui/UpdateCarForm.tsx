@@ -56,7 +56,7 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
   const proccessForm: SubmitHandler<FormType> = async (data) => {
     const dataSent = { ...data, imageUrl: carImageUrl }
 
-    await updateCarInfos(dataSent, carDatas.carId!)
+    await updateCarInfos(dataSent, carDatas.carId!, carDatas.imageUrl)
   }
 
   const handleImageChange = async (e: any, field: any) => {

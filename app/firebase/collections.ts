@@ -12,3 +12,8 @@ export const carsTargetedDocument = (documentId: string) => {
 export const userTargetedDocument = (documentId: string) => {
   return doc(db, "users", documentId)
 }
+
+export const updateUserDataCollection = collection(
+  db,
+  "updateUserSensitiveData",
+)

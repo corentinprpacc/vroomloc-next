@@ -8,7 +8,7 @@ export default async function AgencyHome() {
   const session = await auth()
 
   console.log("sess id", session?.user.id)
-  const carDatas = await getCarById("30T8PjfoOqpGuQtSWMg3")
+  const carDatas = await getCarById("kPApsSNMfiC10hYwNK7Y")
 
   console.log("car in agency", carDatas)
   return (

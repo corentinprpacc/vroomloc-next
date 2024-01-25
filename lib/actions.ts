@@ -3,10 +3,11 @@
 import {
   carsCollection,
   carsTargetedDocument,
+  updateUserDataCollection,
   userTargetedDocument,
   usersCollection,
 } from "@/app/firebase/collections"
-import { getUserRefByEmail } from "@/app/firebase/utils"
+import { getUserByEmail, getUserRefByEmail } from "@/app/firebase/utils"
 import { auth, signIn, signOut } from "@/auth"
 import * as bcrypt from "bcryptjs"
 import { addDoc, updateDoc } from "firebase/firestore"
@@ -118,15 +119,38 @@ export async function addNewCar(data: AddCarFormType) {
     return false
   }
 }
-export async function updateCarInfos(data: AddCarFormType, carId: string) {
+export async function updateCarInfos(
+  data: AddCarFormType,
+  carId: string,
+  carImage: string,
+) {
   console.log("caar id", carId)
   const result = AddCarFormSchema.safeParse(data)
   if (result.success) {
     await updateDoc(carsTargetedDocument(carId), {
       ...data,
+      imageUrl: carImage,
     })
     return true
   } else {
     return false
   }
+}
+
+export async function confirmSecurityPassword(data: {
+  password: string
+}): Promise<{ type: string; message: string }> {
+  const session = await auth()
+  const user = await getUserByEmail(session?.user.email || "")
+  if (!user) return { message: "User not logged in!", type: "error" }
+  const passwordsMatch = await bcrypt.compare(data.password, user.password)
+  if (!passwordsMatch) return { message: "Incorrect Password.", type: "error" }
+  let currentDate = new Date()
+  currentDate.setMinutes(currentDate.getMinutes() + 5)
+  await addDoc(updateUserDataCollection, {
+    expiresAt: currentDate,
+    email: session?.user.email,
+    userId: session?.user.id,
+  })
+  redirect("/agency/profile/edit/sensitive")
 }
