@@ -11,6 +11,8 @@ import { useFormStatus } from "react-dom"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import Loader from "./Loader"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 type Inputs = z.infer<typeof MoreInfosFormSchema>
 
@@ -23,11 +25,19 @@ export default function MoreInfosForm() {
   } = useForm<Inputs>({
     resolver: zodResolver(MoreInfosFormSchema),
   })
+  const { update } = useSession()
   const [isLoading, setLoading] = useState<boolean>(false)
+  const router = useRouter()
   const proccessForm = async (data: Inputs) => {
     setLoading(true)
     setGlobalError("")
     const result = await addMoreInfos(data)
+    await update({
+      moreInfos: {
+        ...data,
+      },
+    })
+    router.push("/agency")
     // if (!result) {
     // setLoading(false)
     // }
@@ -43,7 +53,7 @@ export default function MoreInfosForm() {
         className="flex flex-col items-center mt-2"
         onSubmit={handleSubmit(proccessForm)}
       >
-        <div className="flex-1 flex flex-col w-1/3 items-center rounded-lg px-6">
+        <div className="flex-1 flex flex-col lg:w-1/3 sm:w-2/3 w-full items-center rounded-lg px-6">
           <div className="w-full">
             <div>
               <Label htmlFor="email" className="text-white">
