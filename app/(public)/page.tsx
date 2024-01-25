@@ -4,7 +4,6 @@ export default function Home() {
   return (
     <main>
       <div className="main-application text-white">
-        <Navbar />
         <div className="flex w-full justify-center h-full items-center mt-32">
           <div className="flex flex-col text-center font-light text-6xl">
             <span>RÉSERVEZ</span>
