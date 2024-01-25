@@ -20,13 +20,13 @@ import {
   RegisterFormSchema,
 } from "./schema"
 
-type InputsLogin = z.infer<typeof LoginFormSchema>
+export type InputsLogin = z.infer<typeof LoginFormSchema>
 
-type InputRegister = z.infer<typeof RegisterFormSchema>
+export type InputRegister = z.infer<typeof RegisterFormSchema>
 
-type InputMoreInfos = z.infer<typeof MoreInfosFormSchema>
+export type InputMoreInfos = z.infer<typeof MoreInfosFormSchema>
 
-type AddCarFormType = z.infer<typeof AddCarFormSchema>
+export type AddCarFormType = z.infer<typeof AddCarFormSchema>
 
 export async function authenticate(data: InputsLogin) {
   const result = LoginFormSchema.safeParse(data)
@@ -113,6 +113,18 @@ export async function addNewCar(data: AddCarFormType) {
       carId: response.id,
     })
 
+    return true
+  } else {
+    return false
+  }
+}
+export async function updateCarInfos(data: AddCarFormType, carId: string) {
+  console.log("caar id", carId)
+  const result = AddCarFormSchema.safeParse(data)
+  if (result.success) {
+    await updateDoc(carsTargetedDocument(carId), {
+      ...data,
+    })
     return true
   } else {
     return false

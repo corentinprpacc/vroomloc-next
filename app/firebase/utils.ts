@@ -1,4 +1,4 @@
-import { getDocs, query, where, DocumentReference } from "firebase/firestore"
+import { DocumentReference, getDocs, query, where } from "firebase/firestore"
 import {
   carsCollection,
   ordersCollection,
@@ -60,4 +60,15 @@ export const getUserRefByEmail = async (
     return doc.ref
   })
   return usersMap[0]
+}
+export const getCarById = async (id: string): Promise<any | null> => {
+  const queryCars = query(carsCollection, where("carId", "==", id))
+  const docsCar = await getDocs(queryCars)
+  if (docsCar.docs.length === 0) {
+    return null
+  }
+  const carDatas = docsCar.docs[0].data()
+
+  console.log("userdatas", carDatas)
+  return carDatas
 }

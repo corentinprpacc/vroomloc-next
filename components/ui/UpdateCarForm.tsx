@@ -9,7 +9,7 @@ import {
   carFuel,
   numberOfSeat,
 } from "@/data"
-import { addNewCar } from "@/lib/actions"
+import { updateCarInfos } from "@/lib/actions"
 import sendImageToFirebaseStorage from "@/lib/functions/sendImageToFirebaseStorage"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,8 +20,9 @@ import { Button } from "./button"
 
 type FormType = z.infer<typeof AddCarFormSchema>
 
-function AddCarForm({ currentUserId }: any) {
+function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
   const [carImageUrl, setCarImageUrl] = useState("")
+
   const {
     register,
     control,
@@ -32,29 +33,40 @@ function AddCarForm({ currentUserId }: any) {
   } = useForm<FormType>({
     resolver: zodResolver(AddCarFormSchema),
     defaultValues: {
-      userId: currentUserId,
+      userId: carDatas.userId,
+      brand: carDatas.brand,
+      model: carDatas.model,
+      carYear: carDatas.carYear,
+      dayPrice: carDatas.dayPrice,
+      weekPrice: carDatas.weekPrice,
+      weekEndPrice: carDatas.weekEndPrice,
+      horsePower: carDatas.horsePower,
+      fuelType: carDatas.fuelType,
+      rentDeposit: carDatas.rentDeposit,
+      kilometerAllowed: carDatas.kilometerAllowed,
+      numberOfSeat: carDatas.numberOfSeat,
+      engineType: carDatas.engineType,
+      description: carDatas.description,
     },
   })
 
-  const formValues = watch()
-
-  console.log("form values", formValues)
-
+  const form = watch()
   const brandField = watch("brand")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {
     const dataSent = { ...data, imageUrl: carImageUrl }
 
-    await addNewCar(dataSent)
+    await updateCarInfos(dataSent, carDatas.carId!)
   }
 
   const handleImageChange = async (e: any, field: any) => {
     if (e.target.files.length > 0) {
       const selectedImage = e.target.files[0]
+
       const imageUrl = await sendImageToFirebaseStorage(selectedImage)
 
       if (imageUrl) {
-        //  field.onChange("imageUrl", imageUrl)
+        //field.onChange("imageUrl", imageUrl)
         setCarImageUrl(imageUrl)
       }
     }
@@ -63,34 +75,10 @@ function AddCarForm({ currentUserId }: any) {
   return (
     <form onSubmit={handleSubmit(proccessForm)}>
       <div>
-        <div className="flex justify-center">
-          <div className="w-[280px] mb-4">
-            <Controller
-              name="imageUrl"
-              control={control}
-              rules={{
-                required: {
-                  value: true,
-                  message: "Ce champs est requis",
-                },
-              }}
-              render={({ field }) => (
-                <Input
-                  id="picture"
-                  type="file"
-                  required
-                  className="bg-gray-500 text-white"
-                  {...field}
-                  onChange={(e) => handleImageChange(e, field)}
-                />
-              )}
-            />
-          </div>
-        </div>
         <div className=" flex justify-center">
           <div className="w-[300px] sm:w-[600px] flex flex-wrap justify-center sm:justify-between space-y-2">
             <div className="mt-2">
-              <span>Marque</span>
+              <span>Marque : {form.brand}</span>
               <Controller
                 name="brand"
                 control={control}
@@ -111,7 +99,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.brand?.message}</span>
             </div>
             <div>
-              <span>Model</span>
+              <span>Model: {form.model}</span>
               <Controller
                 name="model"
                 control={control}
@@ -133,7 +121,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.model?.message}</span>
             </div>
             <div>
-              <span>Année du véhicule</span>
+              <span>Année du véhicule : {form.carYear}</span>
               <Controller
                 name="carYear"
                 control={control}
@@ -154,7 +142,7 @@ function AddCarForm({ currentUserId }: any) {
               <span>{errors.carYear?.message}</span>
             </div>
             <div>
-              <span>Carburant</span>
+              <span>Carburant : {form.fuelType}</span>
               <Controller
                 name="fuelType"
                 control={control}
@@ -175,7 +163,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.fuelType?.message}</span>
             </div>
             <div>
-              <span>Moteur</span>
+              <span>Moteur : {form.engineType}</span>
               <Controller
                 name="engineType"
                 control={control}
@@ -196,7 +184,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.engineType?.message}</span>
             </div>
             <div>
-              <span>Nombre de places</span>
+              <span>Nombre de places : {form.numberOfSeat}</span>
               <Controller
                 name="numberOfSeat"
                 control={control}
@@ -218,7 +206,7 @@ function AddCarForm({ currentUserId }: any) {
             </div>
 
             <div className="w-[280px]">
-              <span>Tarif journée</span>
+              <span>Tarif journée : {form.dayPrice}</span>
               <Input
                 {...register("dayPrice", {
                   valueAsNumber: true,
@@ -240,7 +228,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.dayPrice?.message}</span>
             </div>
             <div className="w-[280px]">
-              <span>Tarif semaine</span>
+              <span>Tarif semaine : {form.weekPrice}</span>
               <Input
                 {...register("weekPrice", {
                   valueAsNumber: true,
@@ -262,7 +250,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.weekPrice?.message}</span>
             </div>
             <div className="w-[280px]">
-              <span>Tarif week-end</span>
+              <span>Tarif week-end : {form.weekEndPrice}</span>
               <Input
                 {...register("weekEndPrice", {
                   valueAsNumber: true,
@@ -287,7 +275,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.weekEndPrice?.message}</span>
             </div>
             <div className="w-[280px]">
-              <span>Puissance (CH)</span>
+              <span>Puissance (CH) : {form.horsePower}</span>
               <Input
                 {...register("horsePower", {
                   valueAsNumber: true,
@@ -309,7 +297,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.horsePower?.message}</span>
             </div>
             <div className="w-[280px]">
-              <span>Montant caution</span>
+              <span>Montant caution : {form.rentDeposit}</span>
               <Input
                 {...register("rentDeposit", {
                   valueAsNumber: true,
@@ -331,7 +319,7 @@ function AddCarForm({ currentUserId }: any) {
               <span className="bg-red-800">{errors.rentDeposit?.message}</span>
             </div>
             <div className="w-[280px]">
-              <span>Kilomètres autorisés</span>
+              <span>Kilomètres autorisés : {form.kilometerAllowed}</span>
               <Input
                 {...register("kilometerAllowed", {
                   valueAsNumber: true,
@@ -386,4 +374,4 @@ function AddCarForm({ currentUserId }: any) {
   )
 }
 
-export default AddCarForm
+export default UpdateCarForm

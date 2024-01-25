@@ -49,6 +49,7 @@ export const RegisterFormSchema = MoreInfosFormSchema.and(LoginFormSchema)
 
 export const AddCarFormSchema = z.object({
   userId: z.string().min(1, { message: "id user requis" }),
+  carId: z.string().min(1, { message: "id user requis" }).optional(),
   brand: z.string().min(1, { message: "Veuillez saisir un model" }),
   model: z.string().min(1, { message: "Veuillez saisir un carId correct" }),
   imageUrl: z.any(),
