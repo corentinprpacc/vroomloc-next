@@ -67,7 +67,6 @@ export async function addMoreInfos(data: InputMoreInfos) {
         role: "company",
         id: session?.user.id,
       })
-      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   } else {
     return false
@@ -84,7 +83,7 @@ export async function register(data: InputRegister) {
     // Check if user already exists
     const userInDb = await getUserRefByEmail(result.data.email)
     if (userInDb) {
-      return "L'utilisateur existe déjà"
+      return "Un utilisateur possédant cette adresse mail existe déjà"
     }
     // Add the user to the database and sign in
     const { confirmPassword, password, ...userData } = result.data
@@ -101,7 +100,7 @@ export async function register(data: InputRegister) {
       password,
     })
   } else {
-    return false
+    return "Les données du formulaires sont incorrectes"
   }
 }
 
@@ -109,15 +108,11 @@ export async function updateUserGlobalInfos(
   userId: string,
   data: InputEditProfile,
 ) {
-  console.log("User Id: ", userId)
-  console.log("Data in Action: ", data)
   const result = UpdateProfileFormSchema.safeParse(data)
   if (result.success) {
-    // TODO Update User in Firebase
     const userRef = doc(db, "users", userId)
     if (userRef) {
       await updateDoc(userRef, { ...data })
-      console.log("Informations successfully updated")
     }
   } else {
     return { message: "Invalid Data" }
@@ -146,7 +141,6 @@ export async function updateUserEmail(data: { email: string }) {
   const result = UpdateEmailSchema.safeParse(data)
   const session = await auth()
   if (result.success) {
-    // TODO Update User in Firebase
     const userExists = await getUserByEmail(data.email)
     const emailAlreadyExists = !!userExists
     if (emailAlreadyExists) {
@@ -178,7 +172,6 @@ export async function updateUserPassword(data: {
   const result = UpdatePasswordSchema.safeParse(data)
   const session = await auth()
   if (result.success) {
-    // TODO Update User in Firebase
     const userExists = await getUserByEmail(session?.user.email || "")
     if (!userExists) return { message: "Erreur..." }
     const userRef = doc(db, "users", session?.user.id || "")
