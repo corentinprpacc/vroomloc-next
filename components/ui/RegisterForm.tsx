@@ -1,6 +1,5 @@
 "use client"
 
-import { useFormStatus } from "react-dom"
 import { register as registerAgency, signInWithGoogle } from "@/lib/actions"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -11,11 +10,13 @@ import GoogleIcon from "../icons/GoogleIcon"
 import { z } from "zod"
 import { RegisterFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import Loader from "./Loader"
 
 type InputRegister = z.infer<typeof RegisterFormSchema>
 
 export default function RegisterForm() {
   const [globalError, setGlobalError] = useState("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const {
     handleSubmit,
     register,
@@ -24,11 +25,13 @@ export default function RegisterForm() {
     resolver: zodResolver(RegisterFormSchema),
   })
   const proccessForm = async (data: InputRegister) => {
+    setIsLoading(true)
     setGlobalError("")
-    await registerAgency(data)
-    // if (result) {
-    //   setGlobalError("Identifiant ou mot de passe incorrect")
-    // }
+    const result = await registerAgency(data)
+    if (result) {
+      setGlobalError(result)
+    }
+    setIsLoading(false)
   }
   return (
     <div className="w-full">
@@ -42,6 +45,7 @@ export default function RegisterForm() {
           <Button
             variant="outline"
             className="w-full flex gap-4 items-center relative"
+            disabled={isLoading}
           >
             <GoogleIcon />
             <span>Inscription avec Google</span>
@@ -67,6 +71,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre nom"
                     required
                     {...register("name")}
+                    disabled={isLoading}
                   />
                   {errors.name && errors.name?.message && (
                     <p className="text-red-400 mt-2">{errors.name.message}</p>
@@ -85,6 +90,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre prénom"
                     required
                     {...register("firstName")}
+                    disabled={isLoading}
                   />
                   {errors.firstName && errors.firstName?.message && (
                     <p className="text-red-400 mt-2">
@@ -105,6 +111,7 @@ export default function RegisterForm() {
                     required
                     placeholder="Saisissez votre adresse mail"
                     {...register("email")}
+                    disabled={isLoading}
                   />
                   {errors.email && errors.email?.message && (
                     <p className="text-red-400 mt-2">{errors.email.message}</p>
@@ -123,6 +130,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez le nom de l'agence"
                     required
                     {...register("companyName")}
+                    disabled={isLoading}
                   />
                   {errors.companyName && errors.companyName?.message && (
                     <p className="text-red-400 mt-2">
@@ -143,6 +151,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre numéro tel."
                     required
                     {...register("phoneNumber")}
+                    disabled={isLoading}
                   />
                   {errors.phoneNumber && errors.phoneNumber?.message && (
                     <p className="text-red-400 mt-2">
@@ -165,6 +174,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre adresse"
                     required
                     {...register("street")}
+                    disabled={isLoading}
                   />
                   {errors.street && errors.street?.message && (
                     <p className="text-red-400 mt-2">{errors.street.message}</p>
@@ -183,6 +193,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre code postal"
                     required
                     {...register("postalCode")}
+                    disabled={isLoading}
                   />
                   {errors.postalCode && errors.postalCode?.message && (
                     <p className="text-red-400 mt-2">
@@ -203,6 +214,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre ville"
                     required
                     {...register("city")}
+                    disabled={isLoading}
                   />
                   {errors.city && errors.city?.message && (
                     <p className="text-red-400 mt-2">{errors.city.message}</p>
@@ -221,6 +233,7 @@ export default function RegisterForm() {
                     placeholder="Saisissez votre mot de passe"
                     required
                     {...register("password")}
+                    disabled={isLoading}
                   />
                   {errors.password && errors.password?.message && (
                     <p className="text-red-400 mt-2">
@@ -241,6 +254,7 @@ export default function RegisterForm() {
                     placeholder="Confirmez votre mot de passe"
                     required
                     {...register("confirmPassword")}
+                    disabled={isLoading}
                   />
                   {errors.confirmPassword &&
                     errors.confirmPassword?.message && (
@@ -252,29 +266,28 @@ export default function RegisterForm() {
               </div>
             </div>
           </div>
-          <LoginButton />
-          <div
-            className="flex h-8 items-end space-x-1"
-            aria-live="polite"
-            aria-atomic="true"
+          <Button
+            variant="outline"
+            className="mt-6 w-full"
+            disabled={isLoading}
           >
-            {globalError && (
-              <>
-                <p className="text-sm text-red-500">{globalError}</p>
-              </>
+            {!isLoading ? (
+              <span>Créer mon compte</span>
+            ) : (
+              <Loader className="w-8 h-8" />
             )}
-          </div>
+          </Button>
+          {globalError && (
+            <div
+              className="flex items-center w-full bg-red-100 p-2 rounded-md my-4"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <p className="text-sm text-red-700">{globalError}</p>
+            </div>
+          )}
         </div>
       </form>
     </div>
-  )
-}
-
-function LoginButton() {
-  const { pending } = useFormStatus()
-  return (
-    <Button variant="outline" className="mt-6 w-full" aria-disabled={pending}>
-      Créer mon compte
-    </Button>
   )
 }

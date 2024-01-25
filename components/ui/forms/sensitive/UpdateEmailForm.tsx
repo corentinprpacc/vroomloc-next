@@ -10,7 +10,7 @@ import { z } from "zod"
 import { UpdateEmailSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
-import { updateUserEmail, updateUserGlobalInfos } from "@/lib/actions"
+import { updateUserEmail } from "@/lib/actions"
 import Loader from "@/components/ui/Loader"
 import { useToast } from "../../use-toast"
 
@@ -18,6 +18,7 @@ type InputUpdateEmail = z.infer<typeof UpdateEmailSchema>
 
 export default function UpdateEmailForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState("")
   const { data: session, update } = useSession()
   const { toast } = useToast()
   const {
@@ -28,13 +29,14 @@ export default function UpdateEmailForm() {
     resolver: zodResolver(UpdateEmailSchema),
   })
   const proccessForm = async (data: InputUpdateEmail) => {
+    setError("")
     setIsLoading(true)
     try {
       // await updateUserGlobalInfos(session?.user.id || "", data)
       const result = await updateUserEmail(data)
       if (result && result.message) {
         // TODO set Error
-        console.error(`Error: ${result.message}`)
+        setError(result.message)
         return
       }
       update({ email: data.email })
@@ -73,6 +75,15 @@ export default function UpdateEmailForm() {
       </div>
 
       <LoginButton isLoading={isLoading} />
+      {error && (
+        <div
+          className="flex items-center w-full bg-red-100 p-2 rounded-md my-4"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
     </form>
   )
 }
