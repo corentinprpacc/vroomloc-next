@@ -1,57 +1,53 @@
 "use client"
 
-import { register as registerAgency, signInWithGoogle } from "@/lib/actions"
+import { useFormStatus } from "react-dom"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
-import GoogleIcon from "../icons/GoogleIcon"
 import { z } from "zod"
-import { RegisterFormSchema } from "@/lib/schema"
+import { UpdateProfileFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSession } from "next-auth/react"
+import { updateUserGlobalInfos } from "@/lib/actions"
 import Loader from "./Loader"
+import { useToast } from "./use-toast"
 
-type InputRegister = z.infer<typeof RegisterFormSchema>
+type InputUpdateProfile = z.infer<typeof UpdateProfileFormSchema>
 
 export default function RegisterForm() {
   const [globalError, setGlobalError] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { data: session, update } = useSession()
+  const { toast } = useToast()
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<InputRegister>({
-    resolver: zodResolver(RegisterFormSchema),
+  } = useForm<InputUpdateProfile>({
+    resolver: zodResolver(UpdateProfileFormSchema),
   })
-  const proccessForm = async (data: InputRegister) => {
+  const proccessForm = async (data: InputUpdateProfile) => {
     setIsLoading(true)
     setGlobalError("")
-    const result = await registerAgency(data)
-    if (result) {
-      setGlobalError(result)
+    try {
+      await updateUserGlobalInfos(session?.user.id || "", data)
+      await update({
+        editGeneralInfos: { ...data },
+      })
+      toast({
+        description: "Votre profil a été mis à jour",
+        variant: "success",
+      })
+    } catch (error) {
+      console.error("Error: ", error)
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
   return (
     <div className="w-full">
-      <form
-        className="flex flex-col items-center justify-center w-full"
-        action={async () => {
-          await signInWithGoogle()
-        }}
-      >
-        <div className="lg:w-1/3 md:w-2/3 w-full px-6">
-          <Button
-            variant="outline"
-            className="w-full flex gap-4 items-center relative"
-            disabled={isLoading}
-          >
-            <GoogleIcon />
-            <span>Inscription avec Google</span>
-          </Button>
-        </div>
-      </form>
       <form
         className="mt-8 flex flex-col items-center"
         onSubmit={handleSubmit(proccessForm)}
@@ -70,6 +66,7 @@ export default function RegisterForm() {
                     type="text"
                     placeholder="Saisissez votre nom"
                     required
+                    defaultValue={session?.user.name}
                     {...register("name")}
                     disabled={isLoading}
                   />
@@ -86,6 +83,7 @@ export default function RegisterForm() {
                   <Input
                     className="bg-black text-white"
                     id="firstName"
+                    defaultValue={session?.user.firstName}
                     type="text"
                     placeholder="Saisissez votre prénom"
                     required
@@ -101,31 +99,13 @@ export default function RegisterForm() {
               </div>
               <div className="mt-4">
                 <Label htmlFor="email" className="text-white">
-                  Email
-                </Label>
-                <div className="relative">
-                  <Input
-                    className="bg-black text-white"
-                    id="email"
-                    type="email"
-                    required
-                    placeholder="Saisissez votre adresse mail"
-                    {...register("email")}
-                    disabled={isLoading}
-                  />
-                  {errors.email && errors.email?.message && (
-                    <p className="text-red-400 mt-2">{errors.email.message}</p>
-                  )}
-                </div>
-              </div>
-              <div className="mt-4">
-                <Label htmlFor="email" className="text-white">
                   Nom Agence
                 </Label>
                 <div className="relative">
                   <Input
                     className="bg-black text-white"
                     id="companyName"
+                    defaultValue={session?.user.companyName}
                     type="text"
                     placeholder="Saisissez le nom de l'agence"
                     required
@@ -147,6 +127,7 @@ export default function RegisterForm() {
                   <Input
                     className="bg-black text-white"
                     id="phoneNumber"
+                    defaultValue={session?.user.phoneNumber}
                     type="text"
                     placeholder="Saisissez votre numéro tel."
                     required
@@ -170,6 +151,7 @@ export default function RegisterForm() {
                   <Input
                     className="bg-black text-white"
                     id="street"
+                    defaultValue={session?.user.street}
                     type="text"
                     placeholder="Saisissez votre adresse"
                     required
@@ -188,6 +170,7 @@ export default function RegisterForm() {
                 <div className="relative">
                   <Input
                     className="bg-black text-white"
+                    defaultValue={session?.user.postalCode}
                     id="postalCode"
                     type="text"
                     placeholder="Saisissez votre code postal"
@@ -210,6 +193,7 @@ export default function RegisterForm() {
                   <Input
                     className="bg-black text-white"
                     id="city"
+                    defaultValue={session?.user.city}
                     type="text"
                     placeholder="Saisissez votre ville"
                     required
@@ -221,73 +205,40 @@ export default function RegisterForm() {
                   )}
                 </div>
               </div>
-              <div className="mt-4">
-                <Label htmlFor="password" className="text-white">
-                  Mot de passe
-                </Label>
-                <div className="relative">
-                  <Input
-                    className="bg-black text-white"
-                    id="password"
-                    type="password"
-                    placeholder="Saisissez votre mot de passe"
-                    required
-                    {...register("password")}
-                    disabled={isLoading}
-                  />
-                  {errors.password && errors.password?.message && (
-                    <p className="text-red-400 mt-2">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="mt-4">
-                <Label htmlFor="confirmPassword" className="text-white">
-                  Confirmation du mot de passe
-                </Label>
-                <div className="relative">
-                  <Input
-                    className="bg-black text-white"
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirmez votre mot de passe"
-                    required
-                    {...register("confirmPassword")}
-                    disabled={isLoading}
-                  />
-                  {errors.confirmPassword &&
-                    errors.confirmPassword?.message && (
-                      <p className="text-red-400 mt-2">
-                        {errors.confirmPassword.message}
-                      </p>
-                    )}
-                </div>
-              </div>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="mt-6 w-full"
-            disabled={isLoading}
+          <LoginButton isLoading={isLoading} />
+          <div
+            className="flex h-8 items-end space-x-1"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            {!isLoading ? (
-              <span>Créer mon compte</span>
-            ) : (
-              <Loader className="w-8 h-8" />
+            {globalError && (
+              <>
+                <p className="text-sm text-red-500">{globalError}</p>
+              </>
             )}
-          </Button>
-          {globalError && (
-            <div
-              className="flex items-center w-full bg-red-100 p-2 rounded-md my-4"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <p className="text-sm text-red-700">{globalError}</p>
-            </div>
-          )}
+          </div>
         </div>
       </form>
     </div>
+  )
+}
+
+function LoginButton({ isLoading }: { isLoading: boolean }) {
+  const { pending } = useFormStatus()
+  return (
+    <Button
+      variant="outline"
+      className="mt-6 w-full text-black"
+      aria-disabled={pending}
+      disabled={isLoading}
+    >
+      {!isLoading ? (
+        <span>Mettre à jour mes informations</span>
+      ) : (
+        <Loader className="w-8 h-8" />
+      )}
+    </Button>
   )
 }

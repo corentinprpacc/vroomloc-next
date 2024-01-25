@@ -1,6 +1,5 @@
 "use client"
 
-import { useFormStatus } from "react-dom"
 import { authenticate, signInWithGoogle } from "@/lib/actions"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -11,11 +10,13 @@ import GoogleIcon from "../icons/GoogleIcon"
 import { z } from "zod"
 import { LoginFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import Loader from "./Loader"
 
 type InputLogin = z.infer<typeof LoginFormSchema>
 
 export default function LoginForm() {
   const [globalError, setGlobalError] = useState("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const {
     handleSubmit,
     register,
@@ -24,11 +25,13 @@ export default function LoginForm() {
     resolver: zodResolver(LoginFormSchema),
   })
   const proccessForm = async (data: InputLogin) => {
+    setIsLoading(true)
     setGlobalError("")
     const result = await authenticate(data)
     if (result) {
       setGlobalError("Identifiant ou mot de passe incorrect")
     }
+    setIsLoading(false)
   }
   return (
     <div className="w-full">
@@ -50,6 +53,7 @@ export default function LoginForm() {
                   required
                   placeholder="Saisissez votre adresse mail"
                   {...register("email")}
+                  disabled={isLoading}
                 />
                 {errors.email && errors.email?.message && (
                   <p className="text-red-400 mt-2">{errors.email.message}</p>
@@ -68,6 +72,7 @@ export default function LoginForm() {
                   placeholder="Saisissez votre mot de passe"
                   required
                   {...register("password")}
+                  disabled={isLoading}
                 />
                 {errors.password && errors.password?.message && (
                   <p className="text-red-400 mt-2">{errors.password.message}</p>
@@ -75,22 +80,30 @@ export default function LoginForm() {
               </div>
             </div>
           </div>
-          <LoginButton />
-          <div
-            className="flex h-8 items-end space-x-1"
-            aria-live="polite"
-            aria-atomic="true"
+          <Button
+            variant="outline"
+            className="mt-6 w-full"
+            disabled={isLoading}
           >
-            {globalError && (
-              <>
-                <p className="text-sm text-red-500">{globalError}</p>
-              </>
+            {!isLoading ? (
+              <span>Connexion</span>
+            ) : (
+              <Loader className="w-8 h-8" />
             )}
-          </div>
+          </Button>
+          {globalError && (
+            <div
+              className="flex items-center w-full bg-red-100 p-2 rounded-md my-4"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <p className="text-sm text-red-700">{globalError}</p>
+            </div>
+          )}
         </div>
       </form>
       <form
-        className="mt-2 flex flex-col items-center justify-center w-full"
+        className="mt-4 flex flex-col items-center justify-center w-full"
         action={async () => {
           await signInWithGoogle()
         }}
@@ -99,6 +112,7 @@ export default function LoginForm() {
           <Button
             variant="outline"
             className="w-full flex gap-4 items-center relative"
+            disabled={isLoading}
           >
             <GoogleIcon />
             <span>Connexion avec Google</span>
@@ -106,14 +120,5 @@ export default function LoginForm() {
         </div>
       </form>
     </div>
-  )
-}
-
-function LoginButton() {
-  const { pending } = useFormStatus()
-  return (
-    <Button variant="outline" className="mt-6 w-full" aria-disabled={pending}>
-      Connexion
-    </Button>
   )
 }

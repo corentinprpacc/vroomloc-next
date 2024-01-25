@@ -1,4 +1,4 @@
-import { DocumentReference } from "firebase/firestore"
+import { DocumentReference, Timestamp } from "firebase/firestore"
 
 export type User = {
   id: string
@@ -51,4 +51,10 @@ export type Order = {
   rentStartDate: string
   rentEndDate: string
   rentStatus: string
+}
+
+export type UpdateUserData = {
+  email: string
+  userId: string
+  expiresAt: Timestamp
 }

@@ -11,6 +11,8 @@ import { z } from "zod"
 import { MoreInfosFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Loader from "./Loader"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 type Inputs = z.infer<typeof MoreInfosFormSchema>
 
@@ -23,11 +25,19 @@ export default function MoreInfosForm() {
   } = useForm<Inputs>({
     resolver: zodResolver(MoreInfosFormSchema),
   })
+  const { update } = useSession()
   const [isLoading, setLoading] = useState<boolean>(false)
+  const router = useRouter()
   const proccessForm = async (data: Inputs) => {
     setLoading(true)
     setGlobalError("")
     const result = await addMoreInfos(data)
+    await update({
+      moreInfos: {
+        ...data,
+      },
+    })
+    router.push("/agency")
     // if (!result) {
     // setLoading(false)
     // }
