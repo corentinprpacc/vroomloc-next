@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@auth/firebase-adapter": "^1.0.13",
+    "@fullcalendar/core": "^6.1.10",
+    "@fullcalendar/daygrid": "^6.1.10",
+    "@fullcalendar/interaction": "^6.1.10",
+    "@fullcalendar/react": "^6.1.10",
     "@heroicons/react": "^2.1.1",
     "@hookform/devtools": "^4.3.1",
     "@hookform/resolvers": "^3.3.4",
