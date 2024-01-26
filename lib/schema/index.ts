@@ -79,3 +79,50 @@ export const AddCarFormSchema = z.object({
     .string()
     .min(1, { message: "Veuillez saisir le nombre de place" }),
 })
+
+export const UpdateEmailSchema = z.object({
+  email: z
+    .string()
+    .email("Veuillez saisir une adresse mail valide")
+    .min(1, { message: "Veuillez saisir une adresse mail" }),
+})
+
+export const UpdatePasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+    confirmPassword: z
+      .string()
+      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les deux mots de passe ne sont pas égaux",
+    path: ["password"],
+  })
+
+export const SearchFormSchema = z.object({
+  city: z.string().min(1, { message: "Veuillez saisir la ville de l'agence" }),
+  startDate: z.date(),
+  endDate: z.date(),
+})
+
+export const UpdateProfileFormSchema = z.object({
+  firstName: z.string(),
+  name: z.string(),
+  companyName: z
+    .string()
+    .min(1, { message: "Veuillez saisir un nom d'agence" }),
+  city: z.string().min(1, { message: "Veuillez saisir la ville de l'agence" }),
+  street: z
+    .string()
+    .min(1, { message: "Veuillez saisir l'adresse de l'agence" }),
+  postalCode: z
+    .string()
+    .min(1, { message: "Veuillez saisir le code postal de l'agence" })
+    .regex(postalCodeRegex, "Veuillez saisir un code postal valide"),
+  phoneNumber: z
+    .string()
+    .min(1, { message: "Veuillez saisir le numéro de tel. de l'agence" })
+    .regex(phoneRegex, "Veuillez saisir un numéro de téléphone valide"),
+})

@@ -17,11 +17,13 @@ type FormValues = z.infer<typeof SearchFormSchema>
 interface Props {
   getCars?: Car[]
   onInputChange: (value: string) => void
+  allCities: string[]
 }
 
 const SearchCarsListForm: React.FC<Props> = ({
   getCars,
   onInputChange,
+  allCities,
 }: Props) => {
   const {
     register,
@@ -71,6 +73,7 @@ const SearchCarsListForm: React.FC<Props> = ({
           inputRef={inputRef}
           setValue={setValue}
           getCars={getCars}
+          allCities={allCities}
         />
         <SearchDatePicker
           control={control}

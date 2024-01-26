@@ -4,14 +4,27 @@ import {
   carsCollection,
   carsTargetedDocument,
   updateUserDataCollection,
-  userTargetedDocument,
   usersCollection,
 } from "@/app/firebase/collections"
-import { getUserByEmail, getUserRefByEmail } from "@/app/firebase/utils"
+import { db } from "@/app/firebase/config"
+import {
+  getUpdateUserDataByEmail,
+  getUserByEmail,
+  getUserRefByEmail,
+} from "@/app/firebase/utils"
 import { auth, signIn, signOut } from "@/auth"
 import * as bcrypt from "bcryptjs"
-import { addDoc, deleteDoc, updateDoc } from "firebase/firestore"
+import {
+  addDoc,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore"
 import { AuthError } from "next-auth"
+import { unstable_cache } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import {
@@ -19,15 +32,23 @@ import {
   LoginFormSchema,
   MoreInfosFormSchema,
   RegisterFormSchema,
+  SearchFormSchema,
+  UpdateEmailSchema,
+  UpdatePasswordSchema,
+  UpdateProfileFormSchema,
 } from "./schema"
 
-export type InputsLogin = z.infer<typeof LoginFormSchema>
+type InputsLogin = z.infer<typeof LoginFormSchema>
 
-export type InputRegister = z.infer<typeof RegisterFormSchema>
+type InputRegister = z.infer<typeof RegisterFormSchema>
 
-export type InputMoreInfos = z.infer<typeof MoreInfosFormSchema>
+type InputMoreInfos = z.infer<typeof MoreInfosFormSchema>
 
-export type AddCarFormType = z.infer<typeof AddCarFormSchema>
+type AddCarFormType = z.infer<typeof AddCarFormSchema>
+
+type InputSearch = z.infer<typeof SearchFormSchema>
+
+type InputEditProfile = z.infer<typeof UpdateProfileFormSchema>
 
 export async function authenticate(data: InputsLogin) {
   const result = LoginFormSchema.safeParse(data)
@@ -61,6 +82,8 @@ export async function addMoreInfos(data: InputMoreInfos) {
       })
       await new Promise((resolve) => setTimeout(resolve, 1000))
       redirect("/agency")
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      redirect("/agency")
     }
   } else {
     return false
@@ -83,15 +106,11 @@ export async function register(data: InputRegister) {
     const { confirmPassword, password, ...userData } = result.data
     // Encrypt password
     const passwordCrypt = (await bcrypt.hash(data.password, 10)) as string
-    const response = await addDoc(usersCollection, {
+    await addDoc(usersCollection, {
       ...userData,
       password: passwordCrypt,
       role: "company",
     })
-    await updateDoc(userTargetedDocument(response.id), {
-      id: response.id,
-    })
-
     await signIn("credentials", {
       email: userData.email,
       password,
@@ -103,37 +122,94 @@ export async function register(data: InputRegister) {
 
 export async function addNewCar(data: AddCarFormType) {
   const result = AddCarFormSchema.safeParse(data)
-
+  console.log("result add car", result)
   if (result.success) {
-    const carAdded = await addDoc(carsCollection, {
+    const response = await addDoc(carsCollection, {
       ...data,
+      carId: "789",
     })
 
-    await updateDoc(carAdded, {
-      carId: carAdded.id,
+    await updateDoc(carsTargetedDocument(response.id), {
+      carId: response.id,
     })
+    console.log("respooonse id", response.id)
 
-    redirect("/agency/myCars")
+    return true
   } else {
     return false
   }
 }
-export async function updateCarInfos(
-  data: AddCarFormType,
-  carId: string,
-  carImage: string,
-) {
-  console.log("caar id", carId)
-  const result = AddCarFormSchema.safeParse(data)
-  if (result.success) {
-    await updateDoc(carsTargetedDocument(carId), {
-      ...data,
-      imageUrl: carImage,
-    })
 
-    redirect("/agency/myCars")
+export async function searchForm(data: InputSearch) {
+  const result = SearchFormSchema.safeParse(data)
+  if (result.success) {
+    const queryParamsCity = `?city=${data.city}`
+    const queryParamsDate = `&startDate=${data.startDate.toLocaleDateString()}&endDate=${data.endDate.toLocaleDateString()}`
+    const url = `/cars${queryParamsCity}${queryParamsDate}`
+    redirect(url)
   } else {
     return false
+  }
+}
+
+export const getAllCities = unstable_cache(
+  async (): Promise<string[]> => {
+    const queryCities = query(usersCollection, where("role", "==", "company"))
+    const docsSnapshot = await getDocs(queryCities)
+    return docsSnapshot.docs.map((doc) => {
+      if (doc.data().city) {
+        return doc.data().city
+      }
+    })
+  },
+  ["cities"],
+  { tags: ["cities"] },
+)
+
+export async function updateUserPassword(data: {
+  password: string
+  confirmPassword: string
+}) {
+  const result = UpdatePasswordSchema.safeParse(data)
+  const session = await auth()
+  if (result.success) {
+    const userExists = await getUserByEmail(session?.user.email || "")
+    if (!userExists) return { message: "Erreur..." }
+    const userRef = doc(db, "users", session?.user.id || "")
+    if (userRef) {
+      const passwordCrypt = (await bcrypt.hash(data.password, 10)) as string
+      await updateDoc(userRef, { password: passwordCrypt })
+    }
+  } else {
+    return { message: "Les mots de passe ne correspondent pas" }
+  }
+}
+
+export async function updateUserEmail(data: { email: string }) {
+  const result = UpdateEmailSchema.safeParse(data)
+  const session = await auth()
+  if (result.success) {
+    const userExists = await getUserByEmail(data.email)
+    const emailAlreadyExists = !!userExists
+    if (emailAlreadyExists) {
+      if (userExists.id === session?.user.id) {
+        return { message: "Cette adresse mail est déjà la vôtre." }
+      }
+      return {
+        message: "Un utilisateur possédant cette adresse mail existe déjà",
+      }
+    }
+    const userRef = doc(db, "users", session?.user.id || "")
+    if (userRef) {
+      // Delete verification token user
+      const updateUserData = await getUpdateUserDataByEmail(
+        session?.user.email || "",
+      )
+      if (updateUserData) await deleteDoc(updateUserData.ref)
+      await updateDoc(userRef, { email: data.email })
+    }
+  } else {
+    return { message: "L'adresse mail est invalide." }
   }
 }
 
@@ -155,15 +231,17 @@ export async function confirmSecurityPassword(data: {
   redirect("/agency/profile/edit/sensitive")
 }
 
-export async function deleteCar(carId: string) {
-  try {
-    console.log("deleted car id", carId)
-    await deleteDoc(carsTargetedDocument(carId))
-
-    return true
-  } catch (error) {
-    console.log("voiture non supprimé", error)
-
-    return false
+export async function updateUserGlobalInfos(
+  userId: string,
+  data: InputEditProfile,
+) {
+  const result = UpdateProfileFormSchema.safeParse(data)
+  if (result.success) {
+    const userRef = doc(db, "users", userId)
+    if (userRef) {
+      await updateDoc(userRef, { ...data })
+    }
+  } else {
+    return { message: "Invalid Data" }
   }
 }
