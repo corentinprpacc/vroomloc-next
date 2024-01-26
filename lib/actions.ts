@@ -6,7 +6,15 @@ import {
   getUserRefByEmail,
 } from "@/app/firebase/utils"
 import { auth, signIn, signOut } from "@/auth"
-import { addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore"
+import {
+  addDoc,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { z } from "zod"
@@ -25,6 +33,7 @@ import {
 } from "@/app/firebase/collections"
 import * as bcrypt from "bcryptjs"
 import { db } from "@/app/firebase/config"
+import { unstable_cache } from "next/cache"
 
 type InputsLogin = z.infer<typeof LoginFormSchema>
 
@@ -187,8 +196,25 @@ export async function updateUserPassword(data: {
 export async function searchForm(data: InputSearch) {
   const result = SearchFormSchema.safeParse(data)
   if (result.success) {
-    // doing something
+    const queryParamsCity = `?city=${data.city}`
+    const queryParamsDate = `&startDate=${data.startDate.toLocaleDateString()}&endDate=${data.endDate.toLocaleDateString()}`
+    const url = `/cars${queryParamsCity}${queryParamsDate}`
+    redirect(url)
   } else {
     return false
   }
 }
+
+export const getAllCities = unstable_cache(
+  async (): Promise<string[]> => {
+    const queryCities = query(usersCollection, where("role", "==", "company"))
+    const docsSnapshot = await getDocs(queryCities)
+    return docsSnapshot.docs.map((doc) => {
+      if (doc.data().city) {
+        return doc.data().city
+      }
+    })
+  },
+  ["cities"],
+  { tags: ["cities"] },
+)

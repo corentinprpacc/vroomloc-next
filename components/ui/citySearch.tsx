@@ -1,6 +1,7 @@
 import Image from "next/image"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Car } from "@/app/firebase/types"
+import { useSearchParams } from "next/navigation"
 
 interface InputProps {
   register: any
@@ -8,32 +9,21 @@ interface InputProps {
   setValue: any
   getCars?: Car[]
   onInputChange: (value: string) => void
+  allCities: string[]
 }
 
 const SearchCity: React.FC<InputProps> = ({
   register,
   inputRef,
   setValue,
-  getCars,
   onInputChange,
+  allCities,
 }) => {
+  const searchParams = useSearchParams()
+  const citySearchParams = searchParams.get("city")
   const [showCities, setShowCities] = useState(false)
-  const [cities, setCities] = useState<string[]>([])
-  const [cityInput, setCityInput] = useState("")
-
-  useEffect(() => {
-    if (cities.length === 0 && getCars) {
-      let updatedCities: string[] = []
-
-      getCars.forEach((car) => {
-        if (!updatedCities.includes(car.city)) {
-          updatedCities.push(car.city)
-        }
-      })
-
-      setCities(updatedCities)
-    }
-  }, [getCars, cities])
+  const [cities, setCities] = useState<string[]>(allCities)
+  const [cityInput, setCityInput] = useState(citySearchParams || "")
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
