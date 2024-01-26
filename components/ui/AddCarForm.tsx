@@ -19,8 +19,11 @@ import { z } from "zod"
 import { Button } from "./button"
 
 type FormType = z.infer<typeof AddCarFormSchema>
+type AddCarFormProps = {
+  currentUserId: string
+}
 
-function AddCarForm({ currentUserId }: any) {
+function AddCarForm({ currentUserId }: AddCarFormProps) {
   const [carImageUrl, setCarImageUrl] = useState("")
   const {
     register,
@@ -54,7 +57,7 @@ function AddCarForm({ currentUserId }: any) {
       const imageUrl = await sendImageToFirebaseStorage(selectedImage)
 
       if (imageUrl) {
-        //  field.onChange("imageUrl", imageUrl)
+        // field.onChange("imageUrl", imageUrl)
         setCarImageUrl(imageUrl)
       }
     }

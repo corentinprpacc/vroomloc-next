@@ -72,3 +72,12 @@ export const getCarById = async (id: string): Promise<any | null> => {
   console.log("userdatas", carDatas)
   return carDatas
 }
+
+export const getUserCars = async (id: string): Promise<any> => {
+  const queryCars = query(carsCollection, where("userId", "==", id))
+  const carsDocs = await getDocs(queryCars)
+
+  return carsDocs.docs.map((doc) => ({
+    ...(doc.data() as Car),
+  }))
+}

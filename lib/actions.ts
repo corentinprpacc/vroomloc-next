@@ -10,7 +10,7 @@ import {
 import { getUserByEmail, getUserRefByEmail } from "@/app/firebase/utils"
 import { auth, signIn, signOut } from "@/auth"
 import * as bcrypt from "bcryptjs"
-import { addDoc, updateDoc } from "firebase/firestore"
+import { addDoc, deleteDoc, updateDoc } from "firebase/firestore"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { z } from "zod"
@@ -105,13 +105,12 @@ export async function addNewCar(data: AddCarFormType) {
   const result = AddCarFormSchema.safeParse(data)
 
   if (result.success) {
-    const response = await addDoc(carsCollection, {
+    const carAdded = await addDoc(carsCollection, {
       ...data,
-      carId: "789",
     })
 
-    await updateDoc(carsTargetedDocument(response.id), {
-      carId: response.id,
+    await updateDoc(carAdded, {
+      carId: carAdded.id,
     })
 
     return true
@@ -153,4 +152,15 @@ export async function confirmSecurityPassword(data: {
     userId: session?.user.id,
   })
   redirect("/agency/profile/edit/sensitive")
+}
+
+export async function deleteCar(carId: string) {
+  try {
+    console.log("deleted car id", carId)
+    const carDeleted = await deleteDoc(carsTargetedDocument(carId))
+
+    console.log("display deleted car", carDeleted)
+  } catch (error) {
+    console.log("voiture non supprimé", error)
+  }
 }

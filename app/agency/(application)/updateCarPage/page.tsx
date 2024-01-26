@@ -7,8 +7,6 @@ export default function AddCarPage({
 }: {
   searchParams: FormType
 }) {
-  console.log("name pp", searchParams)
-
   return (
     <div className="bg-black text-white pt-6">
       <h1 className="text-4xl font-bold bg-black text-center text-white">
