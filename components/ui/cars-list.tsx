@@ -1,16 +1,23 @@
 "use client"
 import CardCar from "@/components/ui/card-car"
-import Search from "@/components/ui/SearchCarsListForm"
-import { getAllCars } from "@/app/firebase/utils"
 import { useState, useEffect } from "react"
 import { Car } from "@/app/firebase/types"
 import { query, where, getDocs } from "firebase/firestore"
 import { carsCollection } from "@/app/firebase/collections"
 import SearchCarsListForm from "@/components/ui/SearchCarsListForm"
+import { useSearchParams } from "next/navigation"
 
-export default function CarsList() {
+type CarsListProps = {
+  allCities: string[]
+}
+
+export default function CarsList({ allCities }: CarsListProps) {
+  const searchParams = useSearchParams()
+  const citySearchParams = searchParams.get("city")
+  const startDateSearchParams = searchParams.get("startDate")
+  const endDateSearchParams = searchParams.get("endDate")
   const [cars, setCars] = useState<Car[]>()
-  const [searchCity, setSearchCity] = useState<String>("")
+  const [searchCity, setSearchCity] = useState<String>(citySearchParams || "")
 
   useEffect(() => {
     async function getCars() {
@@ -32,12 +39,17 @@ export default function CarsList() {
   }, [searchCity])
 
   const handleInputChange = (inputValue: string) => {
+    console.log("Handle Input Change")
     setSearchCity(inputValue)
   }
 
   return (
     <>
-      <SearchCarsListForm getCars={cars} onInputChange={handleInputChange} />
+      <SearchCarsListForm
+        getCars={cars}
+        allCities={allCities}
+        onInputChange={handleInputChange}
+      />
       <div className="container relative z-0">
         <p className="text-center my-4">Résultats</p>
         <div className="flex cards-block flex-wrap">
