@@ -44,6 +44,18 @@ export const getAllCars = async (): Promise<Car[]> => {
   }))
 }
 
+export const getCarById = async (id: string): Promise<Car | null> => {
+  const queryCar = query(carsCollection, where("id", "==", id))
+  const docsCar = await getDocs(queryCar)
+  if (docsCar.docs.length === 0) {
+    return null
+  }
+  const carsMap = docsCar.docs.map((doc) => {
+    return { ...doc.data() }
+  })
+  return carsMap[0] as Car
+}
+
 export const getAllOrders = async (): Promise<Order[]> => {
   const ordersDocs = await getDocs(ordersCollection)
   return ordersDocs.docs.map((doc) => ({
