@@ -51,13 +51,12 @@ function AddCarForm({ currentUserId }: AddCarFormProps) {
     await addNewCar(dataSent)
   }
 
-  const handleImageChange = async (e: any, field: any) => {
+  const handleImageChange = async (e: any) => {
     if (e.target.files.length > 0) {
       const selectedImage = e.target.files[0]
       const imageUrl = await sendImageToFirebaseStorage(selectedImage)
 
       if (imageUrl) {
-        // field.onChange("imageUrl", imageUrl)
         setCarImageUrl(imageUrl)
       }
     }
@@ -84,7 +83,7 @@ function AddCarForm({ currentUserId }: AddCarFormProps) {
                   required
                   className="bg-gray-500 text-white"
                   {...field}
-                  onChange={(e) => handleImageChange(e, field)}
+                  onChange={handleImageChange}
                 />
               )}
             />

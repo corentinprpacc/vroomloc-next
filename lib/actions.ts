@@ -113,7 +113,7 @@ export async function addNewCar(data: AddCarFormType) {
       carId: carAdded.id,
     })
 
-    return true
+    redirect("/agency/myCars")
   } else {
     return false
   }
@@ -130,7 +130,8 @@ export async function updateCarInfos(
       ...data,
       imageUrl: carImage,
     })
-    return true
+
+    redirect("/agency/myCars")
   } else {
     return false
   }
@@ -157,10 +158,12 @@ export async function confirmSecurityPassword(data: {
 export async function deleteCar(carId: string) {
   try {
     console.log("deleted car id", carId)
-    const carDeleted = await deleteDoc(carsTargetedDocument(carId))
+    await deleteDoc(carsTargetedDocument(carId))
 
-    console.log("display deleted car", carDeleted)
+    return true
   } catch (error) {
     console.log("voiture non supprimé", error)
+
+    return false
   }
 }

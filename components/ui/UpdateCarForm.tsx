@@ -13,15 +13,18 @@ import { updateCarInfos } from "@/lib/actions"
 import sendImageToFirebaseStorage from "@/lib/functions/sendImageToFirebaseStorage"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./button"
-
 type FormType = z.infer<typeof AddCarFormSchema>
 
 function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
+  const router = useRouter()
   const [carImageUrl, setCarImageUrl] = useState("")
+
+  const { imageUrl, ...carDetails } = carDatas
 
   const {
     register,
@@ -33,20 +36,7 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
   } = useForm<FormType>({
     resolver: zodResolver(AddCarFormSchema),
     defaultValues: {
-      userId: carDatas.userId,
-      brand: carDatas.brand,
-      model: carDatas.model,
-      carYear: carDatas.carYear,
-      dayPrice: carDatas.dayPrice,
-      weekPrice: carDatas.weekPrice,
-      weekEndPrice: carDatas.weekEndPrice,
-      horsePower: carDatas.horsePower,
-      fuelType: carDatas.fuelType,
-      rentDeposit: carDatas.rentDeposit,
-      kilometerAllowed: carDatas.kilometerAllowed,
-      numberOfSeat: carDatas.numberOfSeat,
-      engineType: carDatas.engineType,
-      description: carDatas.description,
+      ...carDetails,
     },
   })
 
@@ -66,7 +56,6 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
       const imageUrl = await sendImageToFirebaseStorage(selectedImage)
 
       if (imageUrl) {
-        //field.onChange("imageUrl", imageUrl)
         setCarImageUrl(imageUrl)
       }
     }

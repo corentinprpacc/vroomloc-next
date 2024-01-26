@@ -73,7 +73,7 @@ export const getCarById = async (id: string): Promise<any | null> => {
   return carDatas
 }
 
-export const getUserCars = async (id: string): Promise<any> => {
+export const getUserCars = async (id: string): Promise<Car[]> => {
   const queryCars = query(carsCollection, where("userId", "==", id))
   const carsDocs = await getDocs(queryCars)
 
