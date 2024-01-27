@@ -122,19 +122,17 @@ export async function register(data: InputRegister) {
 
 export async function addNewCar(data: AddCarFormType) {
   const result = AddCarFormSchema.safeParse(data)
-  console.log("result add car", result)
+
   if (result.success) {
-    const response = await addDoc(carsCollection, {
+    const carAdded = await addDoc(carsCollection, {
       ...data,
-      carId: "789",
     })
 
-    await updateDoc(carsTargetedDocument(response.id), {
-      carId: response.id,
+    await updateDoc(carAdded, {
+      carId: carAdded.id,
     })
-    console.log("respooonse id", response.id)
 
-    return true
+    redirect("/agency/myCars")
   } else {
     return false
   }
