@@ -245,3 +245,16 @@ export async function updateUserGlobalInfos(
     return { message: "Invalid Data" }
   }
 }
+
+export async function deleteCar(carId: string) {
+  try {
+    console.log("deleted car id", carId)
+    await deleteDoc(carsTargetedDocument(carId))
+
+    return true
+  } catch (error) {
+    console.log("voiture non supprimé", error)
+
+    return false
+  }
+}
