@@ -258,3 +258,22 @@ export async function deleteCar(carId: string) {
     return false
   }
 }
+
+export async function updateCarInfos(
+  data: AddCarFormType,
+  carId: string,
+  carImage: string,
+) {
+  console.log("caar id", carId)
+  const result = AddCarFormSchema.safeParse(data)
+  if (result.success) {
+    await updateDoc(carsTargetedDocument(carId), {
+      ...data,
+      imageUrl: carImage,
+    })
+
+    redirect("/agency/myCars")
+  } else {
+    return false
+  }
+}
