@@ -1,12 +1,12 @@
 "use client"
 
 import { confirmSecurityPassword } from "@/lib/actions"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
+import Loader from "./Loader"
 import { Button } from "./button"
 import { Input } from "./input"
-import { useState } from "react"
-import Loader from "./Loader"
-import { useRouter } from "next/navigation"
 
 type InputPassword = {
   password: string

@@ -47,24 +47,37 @@ export const RegisterFormSchema = MoreInfosFormSchema.and(LoginFormSchema)
     path: ["password"],
   })
 
-export const UpdateProfileFormSchema = z.object({
-  firstName: z.string(),
-  name: z.string(),
-  companyName: z
+export const AddCarFormSchema = z.object({
+  userId: z.string().min(1, { message: "id user requis" }),
+  carId: z.string().min(1, { message: "id user requis" }).optional(),
+  brand: z.string().min(1, { message: "Veuillez saisir un model" }),
+  model: z.string().min(1, { message: "Veuillez saisir un carId correct" }),
+  imageUrl: z.any(),
+  carYear: z.string().min(1, { message: "Veuillez saisir une année correct" }),
+  dayPrice: z.number().gt(2, { message: "Veuillez saisir un tarif 24h" }),
+  weekPrice: z
+    .number()
+    .gt(0, { message: "Veuillez saisir un tarif semaine 7j" }),
+  weekEndPrice: z
+    .number()
+    .gt(0, { message: "Veuillez saisir un tarif week end" }),
+  horsePower: z.number().gt(0, { message: "Veuillez saisir une puissance" }),
+  fuelType: z.string().min(1, { message: "Veuillez saisir un carburant" }),
+  rentDeposit: z
+    .number()
+    .gt(0, { message: "Veuillez saisir un montant de caution" }),
+  kilometerAllowed: z
+    .number()
+    .gt(0, { message: "Veuillez saisir le nombre de kilomètre autorisé" }),
+  engineType: z
     .string()
-    .min(1, { message: "Veuillez saisir un nom d'agence" }),
-  city: z.string().min(1, { message: "Veuillez saisir la ville de l'agence" }),
-  street: z
+    .min(1, { message: "Veuillez saisir un type de moteur" }),
+  description: z
     .string()
-    .min(1, { message: "Veuillez saisir l'adresse de l'agence" }),
-  postalCode: z
+    .min(4, { message: "Veuillez saisir une description" }),
+  numberOfSeat: z
     .string()
-    .min(1, { message: "Veuillez saisir le code postal de l'agence" })
-    .regex(postalCodeRegex, "Veuillez saisir un code postal valide"),
-  phoneNumber: z
-    .string()
-    .min(1, { message: "Veuillez saisir le numéro de tel. de l'agence" })
-    .regex(phoneRegex, "Veuillez saisir un numéro de téléphone valide"),
+    .min(1, { message: "Veuillez saisir le nombre de place" }),
 })
 
 export const UpdateEmailSchema = z.object({
@@ -92,4 +105,24 @@ export const SearchFormSchema = z.object({
   city: z.string().min(1, { message: "Veuillez saisir la ville de l'agence" }),
   startDate: z.date(),
   endDate: z.date(),
+})
+
+export const UpdateProfileFormSchema = z.object({
+  firstName: z.string(),
+  name: z.string(),
+  companyName: z
+    .string()
+    .min(1, { message: "Veuillez saisir un nom d'agence" }),
+  city: z.string().min(1, { message: "Veuillez saisir la ville de l'agence" }),
+  street: z
+    .string()
+    .min(1, { message: "Veuillez saisir l'adresse de l'agence" }),
+  postalCode: z
+    .string()
+    .min(1, { message: "Veuillez saisir le code postal de l'agence" })
+    .regex(postalCodeRegex, "Veuillez saisir un code postal valide"),
+  phoneNumber: z
+    .string()
+    .min(1, { message: "Veuillez saisir le numéro de tel. de l'agence" })
+    .regex(phoneRegex, "Veuillez saisir un numéro de téléphone valide"),
 })

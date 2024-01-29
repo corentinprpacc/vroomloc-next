@@ -1,10 +1,11 @@
 import {
+  DocumentReference,
+  Timestamp,
   getDocs,
   query,
   where,
-  DocumentReference,
-  Timestamp,
 } from "firebase/firestore"
+import { unstable_cache } from "next/cache"
 import {
   carsCollection,
   ordersCollection,
@@ -75,6 +76,30 @@ export const getUserRefByEmail = async (
   })
   return usersMap[0]
 }
+export const getCarById = async (id: string): Promise<any | null> => {
+  const queryCars = query(carsCollection, where("carId", "==", id))
+  const docsCar = await getDocs(queryCars)
+  if (docsCar.docs.length === 0) {
+    return null
+  }
+  const carDatas = docsCar.docs[0].data()
+
+  console.log("userdatas", carDatas)
+  return carDatas
+}
+
+export const getUserCars = unstable_cache(
+  async (id: string): Promise<Car[]> => {
+    const queryCars = query(carsCollection, where("userId", "==", id))
+    const carsDocs = await getDocs(queryCars)
+
+    return carsDocs.docs.map((doc) => ({
+      ...(doc.data() as Car),
+    }))
+  },
+  ["get-user-cars"],
+  { tags: ["get-user-cars"] },
+)
 
 type updateUserReturn = {
   ref: DocumentReference

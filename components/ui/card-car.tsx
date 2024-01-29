@@ -1,6 +1,6 @@
 "use client"
-import Image from "next/image"
 import { Car } from "@/app/firebase/types"
+import Image from "next/image"
 import Link from "next/link"
 import { Button } from "./button"
 
@@ -12,7 +12,7 @@ const CardCar: React.FC<Props> = ({ getCar }: Props) => {
   return (
     <div className="w-full md:h-full md:max-w-[25%] md:pl-6 mt-8 md:mt-6 md:grow-0 group">
       <Link href="/">
-        <div className="relative w-full h-auto md:max-h-[25%] relative">
+        <div className="relative w-full h-auto md:max-h-[25%]">
           <Image
             src="/images/car.jpeg"
             alt="car"

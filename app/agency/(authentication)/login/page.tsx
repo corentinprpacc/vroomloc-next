@@ -1,6 +1,5 @@
 import LoginForm from "@/components/ui/LoginForm"
 import Link from "next/link"
-import React from "react"
 
 export default async function Login() {
   return (

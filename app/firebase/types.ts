@@ -35,6 +35,7 @@ export type Car = {
   weekEndPrice: number
   weekPrice: number
   city: string
+  carId?: string
 }
 export type Order = {
   id: string

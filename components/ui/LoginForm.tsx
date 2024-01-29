@@ -1,22 +1,21 @@
 "use client"
 
-import { authenticate, signInWithGoogle } from "@/lib/actions"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import GoogleIcon from "../icons/GoogleIcon"
-import { z } from "zod"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { authenticate, signInWithGoogle } from "@/lib/actions"
 import { LoginFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import Loader from "./Loader"
+import { useState } from "react"
+import { useFormStatus } from "react-dom"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import GoogleIcon from "../icons/GoogleIcon"
 
 type InputLogin = z.infer<typeof LoginFormSchema>
 
 export default function LoginForm() {
   const [globalError, setGlobalError] = useState("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const {
     handleSubmit,
     register,
@@ -25,13 +24,11 @@ export default function LoginForm() {
     resolver: zodResolver(LoginFormSchema),
   })
   const proccessForm = async (data: InputLogin) => {
-    setIsLoading(true)
     setGlobalError("")
     const result = await authenticate(data)
     if (result) {
       setGlobalError("Identifiant ou mot de passe incorrect")
     }
-    setIsLoading(false)
   }
   return (
     <div className="w-full">
@@ -39,7 +36,7 @@ export default function LoginForm() {
         className="flex flex-col items-center mt-2"
         onSubmit={handleSubmit(proccessForm)}
       >
-        <div className="flex-1 flex flex-col lg:w-1/3 sm:w-2/3 w-full items-center rounded-lg px-6">
+        <div className="flex-1 flex flex-col w-1/3 items-center rounded-lg px-6">
           <div className="w-full">
             <div>
               <Label htmlFor="email" className="text-white">
@@ -53,7 +50,6 @@ export default function LoginForm() {
                   required
                   placeholder="Saisissez votre adresse mail"
                   {...register("email")}
-                  disabled={isLoading}
                 />
                 {errors.email && errors.email?.message && (
                   <p className="text-red-400 mt-2">{errors.email.message}</p>
@@ -72,7 +68,6 @@ export default function LoginForm() {
                   placeholder="Saisissez votre mot de passe"
                   required
                   {...register("password")}
-                  disabled={isLoading}
                 />
                 {errors.password && errors.password?.message && (
                   <p className="text-red-400 mt-2">{errors.password.message}</p>
@@ -80,39 +75,30 @@ export default function LoginForm() {
               </div>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="mt-6 w-full"
-            disabled={isLoading}
+          <LoginButton />
+          <div
+            className="flex h-8 items-end space-x-1"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            {!isLoading ? (
-              <span>Connexion</span>
-            ) : (
-              <Loader className="w-8 h-8" />
+            {globalError && (
+              <>
+                <p className="text-sm text-red-500">{globalError}</p>
+              </>
             )}
-          </Button>
-          {globalError && (
-            <div
-              className="flex items-center w-full bg-red-100 p-2 rounded-md my-4"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <p className="text-sm text-red-700">{globalError}</p>
-            </div>
-          )}
+          </div>
         </div>
       </form>
       <form
-        className="mt-4 flex flex-col items-center justify-center w-full"
+        className="mt-2 flex flex-col items-center justify-center w-full"
         action={async () => {
           await signInWithGoogle()
         }}
       >
-        <div className="lg:w-1/3 sm:w-2/3 w-full px-6">
+        <div className="w-1/3 px-6">
           <Button
             variant="outline"
             className="w-full flex gap-4 items-center relative"
-            disabled={isLoading}
           >
             <GoogleIcon />
             <span>Connexion avec Google</span>
@@ -120,5 +106,14 @@ export default function LoginForm() {
         </div>
       </form>
     </div>
+  )
+}
+
+function LoginButton() {
+  const { pending } = useFormStatus()
+  return (
+    <Button variant="outline" className="mt-6 w-full" aria-disabled={pending}>
+      Connexion
+    </Button>
   )
 }

@@ -1,15 +1,16 @@
 "use client"
 
-import { register as registerAgency, signInWithGoogle } from "@/lib/actions"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import GoogleIcon from "../icons/GoogleIcon"
-import { z } from "zod"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { register as registerAgency, signInWithGoogle } from "@/lib/actions"
 import { RegisterFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import GoogleIcon from "../icons/GoogleIcon"
 import Loader from "./Loader"
 
 type InputRegister = z.infer<typeof RegisterFormSchema>
