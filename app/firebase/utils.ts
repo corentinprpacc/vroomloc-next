@@ -5,6 +5,7 @@ import {
   query,
   where,
 } from "firebase/firestore"
+import { unstable_cache } from "next/cache"
 import {
   carsCollection,
   ordersCollection,
@@ -87,14 +88,18 @@ export const getCarById = async (id: string): Promise<any | null> => {
   return carDatas
 }
 
-export const getUserCars = async (id: string): Promise<Car[]> => {
-  const queryCars = query(carsCollection, where("userId", "==", id))
-  const carsDocs = await getDocs(queryCars)
+export const getUserCars = unstable_cache(
+  async (id: string): Promise<Car[]> => {
+    const queryCars = query(carsCollection, where("userId", "==", id))
+    const carsDocs = await getDocs(queryCars)
 
-  return carsDocs.docs.map((doc) => ({
-    ...(doc.data() as Car),
-  }))
-}
+    return carsDocs.docs.map((doc) => ({
+      ...(doc.data() as Car),
+    }))
+  },
+  ["get-user-cars"],
+  { tags: ["get-user-cars"] },
+)
 
 type updateUserReturn = {
   ref: DocumentReference

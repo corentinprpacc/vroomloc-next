@@ -3,6 +3,7 @@
 import {
   carsCollection,
   carsTargetedDocument,
+  ordersCollection,
   updateUserDataCollection,
   usersCollection,
 } from "@/app/firebase/collections"
@@ -24,7 +25,7 @@ import {
   where,
 } from "firebase/firestore"
 import { AuthError } from "next-auth"
-import { unstable_cache } from "next/cache"
+import { revalidateTag, unstable_cache } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import {
@@ -82,8 +83,6 @@ export async function addMoreInfos(data: InputMoreInfos) {
       })
       await new Promise((resolve) => setTimeout(resolve, 1000))
       redirect("/agency")
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      redirect("/agency")
     }
   } else {
     return false
@@ -131,6 +130,8 @@ export async function addNewCar(data: AddCarFormType) {
     await updateDoc(carAdded, {
       carId: carAdded.id,
     })
+
+    revalidateTag("get-user-cars")
 
     redirect("/agency/myCars")
   } else {
@@ -275,3 +276,24 @@ export async function updateCarInfos(
     return false
   }
 }
+
+export const getCarReservations = unstable_cache(
+  async (carId: string): Promise<any[]> => {
+    const queryReservations = query(
+      ordersCollection,
+      where("carId", "==", carId),
+    )
+    const docsSnapshot = await getDocs(queryReservations)
+    return docsSnapshot.docs.map((doc) => {
+      if (doc.data().rentEndDate && doc.data().rentStartDate) {
+        return {
+          title: "reserved",
+          end: doc.data().rentEndDate,
+          start: doc.data().rentStartDate,
+        }
+      }
+    })
+  },
+  ["reservations"],
+  { tags: ["reservations"] },
+)

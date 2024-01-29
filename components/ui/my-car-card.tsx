@@ -20,8 +20,21 @@ const MyCarCard: React.FC<Props> = ({ carDatas }: Props) => {
     }
   }
 
-  const redirectCalendarPage = () => {
-    router.push("/agency/carCalendar")
+  const createQueryString = (name: string, value: string) => {
+    const params = new URLSearchParams()
+    params.set(name, value)
+
+    return params.toString()
+  }
+
+  const redirectCalendarPage = (brand: string, model: string) => {
+    router.push(
+      "/agency/carCalendar" +
+        "?" +
+        createQueryString("brand", brand) +
+        "&" +
+        createQueryString("model", model),
+    )
   }
 
   return (
@@ -35,7 +48,7 @@ const MyCarCard: React.FC<Props> = ({ carDatas }: Props) => {
           permanente.
         </AlertDeleteButton>
         <CalendarDaysIcon
-          onClick={() => redirectCalendarPage()}
+          onClick={() => redirectCalendarPage(carDatas.brand, carDatas.model)}
           className="h-6 w-6 text-white hover:cursor-pointer"
         />
       </div>
