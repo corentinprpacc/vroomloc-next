@@ -62,7 +62,7 @@ const MyCarCard: React.FC<Props> = ({ carDatas }: Props) => {
       </div>
       <Link
         href={{
-          pathname: "/agency/updateCarPage",
+          pathname: "/agency/updateCarDetails/general-information",
           query: carDatas,
         }}
       >

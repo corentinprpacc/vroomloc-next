@@ -1,14 +1,23 @@
-import UpdateCarForm from "@/components/ui/UpdateCarForm"
 import { AddCarFormSchema } from "@/lib/schema"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { z } from "zod"
 type FormType = z.infer<typeof AddCarFormSchema>
-export default function UpdateCarPage({
-  searchParams,
+const UpdateCarDetailsLayout = ({
+  children,
 }: {
-  searchParams: FormType
-}) {
+  children: React.ReactNode
+}) => {
+  const links = [
+    {
+      label: "Informations Générales",
+      href: "/agency/updateCarDetails/general-information",
+    },
+    {
+      label: "Image",
+      href: "/agency/updateCarDetails/update-image",
+    },
+  ]
   return (
     <div className="bg-black text-white pt-6">
       <div className="flex justify-between pl-2 pr-2 mb-8">
@@ -22,9 +31,10 @@ export default function UpdateCarPage({
         </h1>
         <div></div>
       </div>
-      <div className="mt-8">
-        <UpdateCarForm carDatas={searchParams} />
-      </div>
+
+      <div className="mt-8">{children}</div>
     </div>
   )
 }
+
+export default UpdateCarDetailsLayout
