@@ -250,6 +250,7 @@ export async function deleteCar(carId: string) {
     console.log("deleted car id", carId)
     await deleteDoc(carsTargetedDocument(carId))
 
+    revalidateTag("get-user-cars")
     return true
   } catch (error) {
     console.log("voiture non supprimé", error)
@@ -271,29 +272,24 @@ export async function updateCarInfos(
       imageUrl: carImage,
     })
 
+    revalidateTag("get-user-cars")
+
     redirect("/agency/myCars")
   } else {
     return false
   }
 }
 
-export const getCarReservations = unstable_cache(
-  async (carId: string): Promise<any[]> => {
-    const queryReservations = query(
-      ordersCollection,
-      where("carId", "==", carId),
-    )
-    const docsSnapshot = await getDocs(queryReservations)
-    return docsSnapshot.docs.map((doc) => {
-      if (doc.data().rentEndDate && doc.data().rentStartDate) {
-        return {
-          title: "reserved",
-          end: doc.data().rentEndDate,
-          start: doc.data().rentStartDate,
-        }
+export const getCarReservations = async (carId: string): Promise<any[]> => {
+  const queryReservations = query(ordersCollection, where("carId", "==", carId))
+  const docsSnapshot = await getDocs(queryReservations)
+  return docsSnapshot.docs.map((doc) => {
+    if (doc.data().rentEndDate && doc.data().rentStartDate) {
+      return {
+        title: "réservé",
+        end: doc.data().rentEndDate,
+        start: doc.data().rentStartDate,
       }
-    })
-  },
-  ["reservations"],
-  { tags: ["reservations"] },
-)
+    }
+  })
+}
