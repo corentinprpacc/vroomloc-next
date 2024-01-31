@@ -264,7 +264,6 @@ export async function updateCarInfos(
   carId: string,
   carImage: string,
 ) {
-  console.log("caar id", carId)
   const result = AddCarFormSchema.safeParse(data)
   if (result.success) {
     await updateDoc(carsTargetedDocument(carId), {
@@ -278,6 +277,21 @@ export async function updateCarInfos(
   } else {
     return false
   }
+}
+export async function updateCarImage(carId: string, carImage: string) {
+  try {
+    await updateDoc(carsTargetedDocument(carId), {
+      imageUrl: carImage,
+    })
+
+    revalidateTag("get-user-cars")
+  } catch (error) {
+    throw new Error(
+      " Erreur lors de la modification de l'image dans la base de données",
+    )
+  }
+
+  redirect("/agency/myCars")
 }
 
 export const getCarReservations = async (carId: string): Promise<any[]> => {

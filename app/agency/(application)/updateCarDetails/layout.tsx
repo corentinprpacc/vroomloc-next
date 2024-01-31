@@ -8,16 +8,6 @@ const UpdateCarDetailsLayout = ({
 }: {
   children: React.ReactNode
 }) => {
-  const links = [
-    {
-      label: "Informations Générales",
-      href: "/agency/updateCarDetails/general-information",
-    },
-    {
-      label: "Image",
-      href: "/agency/updateCarDetails/update-image",
-    },
-  ]
   return (
     <div className="bg-black text-white pt-6">
       <div className="flex justify-between pl-2 pr-2 mb-8">
@@ -31,7 +21,6 @@ const UpdateCarDetailsLayout = ({
         </h1>
         <div></div>
       </div>
-
       <div className="mt-8">{children}</div>
     </div>
   )

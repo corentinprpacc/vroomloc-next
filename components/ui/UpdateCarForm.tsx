@@ -10,10 +10,8 @@ import {
   numberOfSeat,
 } from "@/data"
 import { updateCarInfos } from "@/lib/actions"
-import sendImageToFirebaseStorage from "@/lib/functions/sendImageToFirebaseStorage"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -21,7 +19,6 @@ import { Button } from "./button"
 type FormType = z.infer<typeof AddCarFormSchema>
 
 function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
-  const router = useRouter()
   const [carImageUrl, setCarImageUrl] = useState("")
 
   const { imageUrl, ...carDetails } = carDatas
@@ -48,19 +45,6 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
 
     await updateCarInfos(dataSent, carDatas.carId!, carDatas.imageUrl)
   }
-
-  const handleImageChange = async (e: any, field: any) => {
-    if (e.target.files.length > 0) {
-      const selectedImage = e.target.files[0]
-
-      const imageUrl = await sendImageToFirebaseStorage(selectedImage)
-
-      if (imageUrl) {
-        setCarImageUrl(imageUrl)
-      }
-    }
-  }
-
   return (
     <form onSubmit={handleSubmit(proccessForm)}>
       <div>
