@@ -76,13 +76,22 @@ export const getUserRefByEmail = async (
   })
   return usersMap[0]
 }
-export const getCarById = async (id: string): Promise<any | null> => {
-  const queryCars = query(carsCollection, where("carId", "==", id))
+export const getCarById = async (
+  carId: string,
+  userId: string,
+): Promise<any | null> => {
+  const queryCars = query(
+    carsCollection,
+    where("carId", "==", carId),
+    where("userId", "==", userId),
+  )
   const docsCar = await getDocs(queryCars)
   if (docsCar.docs.length === 0) {
     return null
   }
+
   const carDatas = docsCar.docs[0].data()
+  console.log("car datas server side", carDatas)
 
   return carDatas
 }

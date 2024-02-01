@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { updateCarImage } from "@/lib/actions"
 import sendImageToFirebaseStorage from "@/lib/functions/sendImageToFirebaseStorage"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
@@ -23,6 +24,7 @@ export default function UpdateImagePage({
   const [selectedFile, setSelectedFile] = useState<any>()
   const [isFileUploading, setIsFileUploading] = useState(false)
   const [error, setError] = useState<string>("")
+  const { data: session, update } = useSession()
 
   async function handleImage(e: any) {
     if (e.target.files) {
@@ -47,13 +49,13 @@ export default function UpdateImagePage({
 
   useEffect(() => {
     async function fetchCarDatas() {
-      const carDatas = await getCarById(carId)
+      const carDatas = await getCarById(carId, session?.user.id!)
 
       setCurrentCarImage(carDatas.imageUrl)
     }
 
     fetchCarDatas()
-  }, [carId])
+  }, [session?.user.id, carId])
 
   return (
     <div className="h-screen">

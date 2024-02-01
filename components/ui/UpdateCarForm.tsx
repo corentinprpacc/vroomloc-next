@@ -14,6 +14,7 @@ import {
 import { updateCarInfos } from "@/lib/actions"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -24,6 +25,7 @@ type UpdateCarInformationProps = {
 }
 function UpdateCarForm({ carId }: UpdateCarInformationProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { data: session, update } = useSession()
   const {
     register,
     control,
@@ -40,7 +42,7 @@ function UpdateCarForm({ carId }: UpdateCarInformationProps) {
 
   useEffect(() => {
     async function fetchCarDatas() {
-      const carTargeted = await getCarById(carId)
+      const carTargeted = await getCarById(carId, session?.user.id!)
 
       setValue("model", carTargeted.model)
       setValue("brand", carTargeted.brand)
@@ -60,7 +62,7 @@ function UpdateCarForm({ carId }: UpdateCarInformationProps) {
     }
 
     fetchCarDatas()
-  }, [carId, setValue])
+  }, [carId, setValue, session?.user.id])
 
   const form = watch()
   const brandField = watch("brand")
