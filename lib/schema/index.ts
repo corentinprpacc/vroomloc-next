@@ -145,7 +145,8 @@ export const BookFormSchema = z.object({
     value: z.boolean(),
     price: z.number(),
   }),
-  // kilometersMoreOptions: z.object({
-  //   value: z.number(),
-  // }),
+  moreKilometersOptions: z.object({
+    km: z.number(),
+    price: z.number(),
+  }),
 })

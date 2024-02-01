@@ -72,6 +72,14 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
     { km: 600, value: true, price: 200 },
     { km: 800, value: false, price: 250 },
   ])
+  const [moreKilometersOptions, setMoreKilometersOptions] = useState([
+    { km: 0, price: 0 },
+    { km: 100, price: 50 },
+    { km: 200, price: 100 },
+    { km: 300, price: 150 },
+    { km: 400, price: 200 },
+    { km: 500, price: 250 },
+  ])
   useEffect(() => {
     async function getCar() {
       if (id) {
@@ -124,10 +132,13 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
     setValue("guaranteeOptions", updatedGuaranteeOptions[index])
   }
 
-  // const handleInputSliderChange = (inputValue: number) => {
-  //   setSliderKm(inputValue)
-  //   setValue("kilometersMoreOptions", { value: inputValue })
-  // }
+  const handleInputSliderChange = (
+    selectedKilometerOption: { km: number; price: number } | null,
+  ) => {
+    if (selectedKilometerOption !== null) {
+      setValue("moreKilometersOptions", selectedKilometerOption)
+    }
+  }
 
   return (
     <>
@@ -328,10 +339,11 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
             <div className="w-full bg-black px-6 pb-6 text-white">
               <p className="py-2">KILOMETRES SUPPLÉMENTAIRES</p>
               <hr className="w-full mb-6" />
-              {/* <FixedSlider
+              <FixedSlider
                 control={control}
+                moreKilometersOptions={moreKilometersOptions}
                 onInputSliderChange={handleInputSliderChange}
-              /> */}
+              />
             </div>
             <div className="w-full bg-black px-6 pb-6 text-white">
               <p className="py-2">KILOMETRES SUPPLÉMENTAIRES</p>

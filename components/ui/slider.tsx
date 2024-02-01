@@ -5,31 +5,38 @@ import "rc-slider/assets/index.css"
 import { Controller } from "react-hook-form"
 import { useState } from "react"
 
-const marks = {
-  0: "0",
-  100: "100",
-  200: "200",
-  300: "300",
-  400: "400",
-  500: "500",
+interface KilometerOption {
+  km: number
+  price: number
 }
 
 interface SliderProps {
   control: any
-  onInputSliderChange: (value: number) => void
+  moreKilometersOptions: KilometerOption[]
+  onInputSliderChange: (value: KilometerOption) => void
 }
 
 const FixedSlider: React.FC<SliderProps> = ({
   control,
+  moreKilometersOptions,
   onInputSliderChange,
 }) => {
   const min = 0
   const max = 500
   const [maxValue, setMaxValue] = useState<number>(0)
 
+  const marks: { [key: number]: string } = {}
+  moreKilometersOptions.forEach((option) => {
+    marks[option.km] = option.km.toString()
+  })
+
   const handleChange = (value: number | number[]) => {
     setMaxValue(value as number)
-    onInputSliderChange(value as number)
+
+    const selectedKilometerOption = moreKilometersOptions.find(
+      (option) => option.km === value,
+    )
+    onInputSliderChange(selectedKilometerOption!)
   }
 
   return (
@@ -39,7 +46,7 @@ const FixedSlider: React.FC<SliderProps> = ({
         name="maxValue"
         control={control}
         defaultValue={maxValue}
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange } }) => (
           <Slider
             min={0}
             max={500}
@@ -48,7 +55,6 @@ const FixedSlider: React.FC<SliderProps> = ({
             step={null}
             dots
             onChange={handleChange}
-            // value={value}
           />
         )}
       />
