@@ -8,8 +8,15 @@ import getWindowWidth from "@/lib/hooks/getWindowWidth"
 import { Button } from "@/components/ui/button"
 import SearchDatePicker from "@/components/ui/datesSearch"
 import useTextToggle from "@/lib/hooks/toggleText"
+import Carousel from "@/components/ui/carousel"
+import { Controller, useForm, SubmitHandler } from "react-hook-form"
+import { boolean, z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { BookFormSchema } from "@/lib/schema"
+import FixedSlider from "@/components/ui/slider"
 
-type CarDetailsModalProps = {
+type FormValues = z.infer<typeof BookFormSchema>
+interface CarDetailsModalProps {
   onClose: () => void
   isOpen: boolean
   id: string
@@ -19,7 +26,23 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
   onClose,
   isOpen,
   id,
-}) => {
+}: CarDetailsModalProps) => {
+  const {
+    register,
+    setValue,
+    control,
+    handleSubmit,
+    watch,
+    formState,
+    formState: { isValidating },
+  } = useForm<FormValues>({
+    resolver: zodResolver(BookFormSchema),
+    defaultValues: {
+      paymentOptions: { name: "", value: false, price: 0 },
+      guaranteeOptions: { name: "", value: false, price: 0 },
+      kilometersOptions: { km: 0, value: false, price: 0 },
+    },
+  })
   const [car, setCar] = useState<Car | null>(null)
   const windowWidth = getWindowWidth()
   const isMobile = windowWidth <= 768
@@ -34,6 +57,21 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
     toggleText,
     showFullText,
   } = useTextToggle(initialDescription, 200)
+  const classes = "basis-1/2"
+  const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data)
+  const [sliderKm, setSliderKm] = useState<number>(0)
+  const [paymentOptions, setPaymentOptions] = useState([
+    { name: "Acompte", value: true, price: 300 },
+    { name: "Total", value: false, price: 600 },
+  ])
+  const [guaranteeOptions, setGuaranteeOptions] = useState([
+    { name: "Caution Basique 3000 EUR", value: true, price: 3000 },
+    { name: "Caution réduite à 2500 EUR", value: false, price: 2500 },
+  ])
+  const [kilometersOptions, setKilometersOptions] = useState([
+    { km: 600, value: true, price: 200 },
+    { km: 800, value: false, price: 250 },
+  ])
   useEffect(() => {
     async function getCar() {
       if (id) {
@@ -44,6 +82,52 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
 
     getCar()
   }, [id])
+
+  const handleOptionsClick = <T extends keyof FormValues>(
+    index: number,
+    options: FormValues[T][],
+    setOptions: React.Dispatch<React.SetStateAction<FormValues[T][]>>,
+    optionName: T,
+  ) => {
+    const updatedOptions = options.map((option, i) => {
+      if (i === index) {
+        return { ...option, value: true }
+      } else {
+        return { ...option, value: false }
+      }
+    })
+    setOptions(updatedOptions)
+    setValue(optionName as any, updatedOptions[index] as any)
+  }
+
+  const handlePaymentOptionsClick = (index: number) => {
+    const updatedPaymentOptions = paymentOptions.map((option, i) => {
+      if (i === index) {
+        return { ...option, value: true }
+      } else {
+        return { ...option, value: false }
+      }
+    })
+    setPaymentOptions(updatedPaymentOptions)
+    setValue("paymentOptions", updatedPaymentOptions[index])
+  }
+
+  const handleGuaranteeOptionsClick = (index: number) => {
+    const updatedGuaranteeOptions = guaranteeOptions.map((option, i) => {
+      if (i === index) {
+        return { ...option, value: true }
+      } else {
+        return { ...option, value: false }
+      }
+    })
+    setGuaranteeOptions(updatedGuaranteeOptions)
+    setValue("guaranteeOptions", updatedGuaranteeOptions[index])
+  }
+
+  // const handleInputSliderChange = (inputValue: number) => {
+  //   setSliderKm(inputValue)
+  //   setValue("kilometersMoreOptions", { value: inputValue })
+  // }
 
   return (
     <>
@@ -95,7 +179,10 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
               </h1>
             </div>
           </div>
-          <div className="md:basis-1/2 md:pl-6">
+          <form
+            className="md:basis-1/2 md:pl-6"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div className="flex flex-wrap w-full">
               <div className="md:basis-1/2 grow-0 bg-black text-white text-center w-full">
                 <div className="flex flex-col justify-center align-center w-full h-full p-6">
@@ -108,7 +195,7 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
               </div>
               <div className="md:basis-1/2 grow-0 bg-white p-6 w-full text-center">
                 <div>
-                  <button>
+                  <button type="submit">
                     DEMANDE DE RESERVATION
                     <br />
                     (empreinte bancaire de 1€)
@@ -116,14 +203,146 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
                 </div>
               </div>
             </div>
-            <div>
-              {/* <SearchDatePicker startDate={startDate} endDate={endDate} /> */}
+            <div className="flex flex-wrap w-full bg-black px-6 pb-6">
+              <SearchDatePicker
+                control={control}
+                startDate={startDate}
+                endDate={endDate}
+                classes={classes}
+              />
             </div>
-          </div>
+            <div className="flex flex-wrap w-full bg-black px-6 pb-6 text-white">
+              <p className="py-2">OPTIONS DE PAIEMENT</p>
+              <hr className="w-full" />
+              <div>
+                {paymentOptions.map((option, index) => (
+                  <label className="inline-flex mr-4 mt-4" key={index}>
+                    <span
+                      className="relative inline-flex cursor-pointer"
+                      onClick={() =>
+                        handleOptionsClick(
+                          index,
+                          paymentOptions,
+                          setPaymentOptions,
+                          "paymentOptions",
+                        )
+                      }
+                    >
+                      <span>
+                        <Image
+                          src={
+                            option.value
+                              ? "/images/icons/radio-button-checked-icon.svg"
+                              : "/images/icons/radio-button-unchecked-icon.svg"
+                          }
+                          alt={
+                            option.value ? "Checked button" : "Unchecked button"
+                          }
+                          width={24}
+                          height={24}
+                          className="relative z-10"
+                        />
+                      </span>
+                    </span>
+                    <span className="ml-2">{option.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap w-full bg-black px-6 pb-6 text-white">
+              <p className="py-2">CAUTION</p>
+              <hr className="w-full" />
+              <div>
+                {guaranteeOptions.map((option, index) => (
+                  <label className="inline-flex mr-4 mt-4" key={index}>
+                    <span
+                      className="relative inline-flex cursor-pointer"
+                      onClick={() =>
+                        handleOptionsClick(
+                          index,
+                          guaranteeOptions,
+                          setGuaranteeOptions,
+                          "guaranteeOptions",
+                        )
+                      }
+                    >
+                      <span>
+                        <Image
+                          src={
+                            option.value
+                              ? "/images/icons/radio-button-checked-icon.svg"
+                              : "/images/icons/radio-button-unchecked-icon.svg"
+                          }
+                          alt={
+                            option.value ? "Checked button" : "Unchecked button"
+                          }
+                          width={24}
+                          height={24}
+                          className="relative z-10"
+                        />
+                      </span>
+                    </span>
+                    <span className="ml-2">{option.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap w-full bg-black px-6 pb-6 text-white">
+              <p className="py-2">KILOMETRES INCLUS :</p>
+              <hr className="w-full" />
+              <div>
+                {kilometersOptions.map((option, index) => (
+                  <label className="inline-flex mr-4 mt-4" key={index}>
+                    <span
+                      className="relative inline-flex cursor-pointer"
+                      onClick={() =>
+                        handleOptionsClick(
+                          index,
+                          kilometersOptions,
+                          setKilometersOptions,
+                          "kilometersOptions",
+                        )
+                      }
+                    >
+                      <span>
+                        <Image
+                          src={
+                            option.value
+                              ? "/images/icons/radio-button-checked-icon.svg"
+                              : "/images/icons/radio-button-unchecked-icon.svg"
+                          }
+                          alt={
+                            option.value ? "Checked button" : "Unchecked button"
+                          }
+                          width={24}
+                          height={24}
+                          className="relative z-10"
+                        />
+                      </span>
+                    </span>
+                    <span className="ml-2">{option.km} km</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="w-full bg-black px-6 pb-6 text-white">
+              <p className="py-2">KILOMETRES SUPPLÉMENTAIRES</p>
+              <hr className="w-full mb-6" />
+              {/* <FixedSlider
+                control={control}
+                onInputSliderChange={handleInputSliderChange}
+              /> */}
+            </div>
+            <div className="w-full bg-black px-6 pb-6 text-white">
+              <p className="py-2">KILOMETRES SUPPLÉMENTAIRES</p>
+              <hr className="w-full" />
+            </div>
+          </form>
         </div>
         <div className="flex flex-col md:flex-row grow-0 basis-full px-8 pt-16 pb-8 text-white">
-          <div className="md:basis-1/2 grow-0 bg-black px-4">
-            <p>hello</p>
+          <div className="md:basis-1/2 grow-0 bg-black px-4 pt-4 pb-8">
+            {/* <Carousel slides={car?.images} /> */}
+            <Carousel />
           </div>
           <div className="md:basis-1/2 grow-0 bg-black mt-6 md:mt-0 px-4 pt-4 pb-8">
             <div className="mb-2">

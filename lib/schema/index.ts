@@ -126,3 +126,26 @@ export const UpdateProfileFormSchema = z.object({
     .min(1, { message: "Veuillez saisir le numéro de tel. de l'agence" })
     .regex(phoneRegex, "Veuillez saisir un numéro de téléphone valide"),
 })
+
+export const BookFormSchema = z.object({
+  startDate: z.date(),
+  endDate: z.date(),
+  paymentOptions: z.object({
+    name: z.string(),
+    value: z.boolean(),
+    price: z.number(),
+  }),
+  guaranteeOptions: z.object({
+    name: z.string(),
+    value: z.boolean(),
+    price: z.number(),
+  }),
+  kilometersOptions: z.object({
+    km: z.number(),
+    value: z.boolean(),
+    price: z.number(),
+  }),
+  // kilometersMoreOptions: z.object({
+  //   value: z.number(),
+  // }),
+})

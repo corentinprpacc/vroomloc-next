@@ -40,3 +40,31 @@
         inset: 0 !important;
     }
 }
+
+.swiper-slide {
+    width: 22rem;
+}
+
+.swiper-button-prev:after, .swiper-button-next:after, .swiper-button-prev.swiper-button-disabled, .swiper-button-next.swiper-button-disabled {
+    color: white;
+}
+
+.swiper-pagination-bullet {
+    background-color: white !important;
+}
+
+.rc-slider-mark-text {
+    display: none !important;
+}
+
+.rc-slider-track, .rc-slider-tracks {
+    background-color: white !important;
+}
+
+.rc-slider-rail {
+    background-color: #666666 !important;
+}
+
+.rc-slider-handle, .rc-slider-dot-active {
+    border-color: white !important;
+}

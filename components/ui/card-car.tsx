@@ -18,7 +18,6 @@ const CardCar: React.FC<Props> = ({ getCar }: Props) => {
   const router = useRouter()
   const modalUrl = `/cars/${encodeURIComponent(getCar.brand)}-${encodeURIComponent(getCar.model)}?id=${getCar.id}`
   const pageUrl = "/cars"
-  console.log("car ", getCar)
 
   const openModalPage = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
