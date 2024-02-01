@@ -60,8 +60,8 @@ export default function UpdateImagePage({
   }, [carId])
 
   return (
-    <div className="ml-8 mt-8 h-screen">
-      <ul className="text-white flex gap-4">
+    <div className="h-screen">
+      <ul className="ml-8 text-white flex gap-4 sticky bg-black pt-6 pb-6 md:pt-0 top-20 z-20">
         <li
           className={`text-lg transition-all duration-500 border-b border-b-transparent hover:text-gray-300 ${
             pathname === `/agency/updateCarDetails/general-information/${carId}`

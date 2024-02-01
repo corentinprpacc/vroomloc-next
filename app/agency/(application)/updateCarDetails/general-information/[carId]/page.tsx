@@ -16,8 +16,8 @@ export default function GeneralCarInformationPage({
   const pathname = usePathname()
 
   return (
-    <div className="ml-8 mt-8">
-      <ul className="text-white flex gap-4">
+    <div>
+      <ul className="ml-8 text-white flex gap-4 sticky bg-black pt-6 pb-6 md:pt-0 top-20 z-20">
         <li
           className={`text-lg transition-all duration-500 border-b border-b-transparent hover:text-gray-300 ${
             pathname === `/agency/updateCarDetails/general-information/${carId}`
