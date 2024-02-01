@@ -1,6 +1,7 @@
 "use client"
 
 import { getCarById } from "@/app/firebase/utils"
+import Loader from "@/components/ui/Loader"
 import { Input } from "@/components/ui/input"
 import { SelectScrollable } from "@/components/ui/selectScrollable"
 import {
@@ -13,7 +14,7 @@ import {
 import { updateCarInfos } from "@/lib/actions"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./button"
@@ -22,6 +23,7 @@ type UpdateCarInformationProps = {
   carId: string
 }
 function UpdateCarForm({ carId }: UpdateCarInformationProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const {
     register,
     control,
@@ -40,7 +42,6 @@ function UpdateCarForm({ carId }: UpdateCarInformationProps) {
     async function fetchCarDatas() {
       const carTargeted = await getCarById(carId)
 
-      console.log("car targeted", carTargeted)
       setValue("model", carTargeted.model)
       setValue("brand", carTargeted.brand)
       setValue("userId", carTargeted.userId)
@@ -65,7 +66,9 @@ function UpdateCarForm({ carId }: UpdateCarInformationProps) {
   const brandField = watch("brand")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {
+    setIsSubmitting(true)
     await updateCarInfos(data, carId)
+    setIsSubmitting(false)
   }
   return (
     <form onSubmit={handleSubmit(proccessForm)}>
@@ -358,8 +361,8 @@ function UpdateCarForm({ carId }: UpdateCarInformationProps) {
       </div>
       <div className="flex justify-center mt-4 pb-4">
         <Button variant="outline" className="mt-2 w-48 text-black">
-          {isSubmitted ? (
-            <span className="text-green-700"> Envoyé !</span>
+          {isSubmitting ? (
+            <Loader className="h-8" />
           ) : (
             <span className="text-white-700"> Ajouter</span>
           )}

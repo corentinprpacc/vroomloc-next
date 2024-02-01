@@ -29,7 +29,6 @@ export default function UpdateImagePage({
 
   async function handleImage(e: any) {
     if (e.target.files) {
-      console.log("fiiile", e.target.files[0])
       setSelectedImage(URL.createObjectURL(e.target.files[0]))
       setSelectedFile(e.target.files[0])
       setError("")
@@ -43,8 +42,9 @@ export default function UpdateImagePage({
       if (imageUrl && carId) {
         await updateCarImage(carId, imageUrl)
       }
+    } else {
+      setError("Veuillez sélectionner une image")
     }
-    setError("Veuillez sélectionner une image")
     setIsFileUploading(false)
   }
 
@@ -52,7 +52,6 @@ export default function UpdateImagePage({
     async function fetchCarDatas() {
       const carDatas = await getCarById(carId)
 
-      console.log("current image set", carDatas.imageUrl)
       setCurrentCarImage(carDatas.imageUrl)
     }
 

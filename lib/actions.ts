@@ -247,14 +247,11 @@ export async function updateUserGlobalInfos(
 
 export async function deleteCar(carId: string) {
   try {
-    console.log("deleted car id", carId)
     await deleteDoc(carsTargetedDocument(carId))
 
     revalidateTag("get-user-cars")
     return true
   } catch (error) {
-    console.log("voiture non supprimé", error)
-
     return false
   }
 }

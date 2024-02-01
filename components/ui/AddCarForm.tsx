@@ -39,10 +39,6 @@ function AddCarForm({ currentUserId }: AddCarFormProps) {
     },
   })
 
-  const formValues = watch()
-
-  console.log("form values", formValues)
-
   const brandField = watch("brand")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {

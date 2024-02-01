@@ -3,7 +3,6 @@
 import UpdateCarForm from "@/components/ui/UpdateCarForm"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
 type GeneralCarInformationPageProps = {
   params: {
     carId: string
@@ -12,7 +11,6 @@ type GeneralCarInformationPageProps = {
 export default function GeneralCarInformationPage({
   params: { carId },
 }: GeneralCarInformationPageProps) {
-  const [currentCarImage, setCurrentCarImage] = useState()
   const pathname = usePathname()
 
   return (

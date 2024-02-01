@@ -84,7 +84,6 @@ export const getCarById = async (id: string): Promise<any | null> => {
   }
   const carDatas = docsCar.docs[0].data()
 
-  console.log("userdatas", carDatas)
   return carDatas
 }
 
