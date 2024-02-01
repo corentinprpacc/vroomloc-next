@@ -1,16 +1,18 @@
 "use client"
 
 import UpdateCarForm from "@/components/ui/UpdateCarForm"
-import { AddCarFormSchema } from "@/lib/schema"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { z } from "zod"
-type FormType = z.infer<typeof AddCarFormSchema>
+import { useState } from "react"
+type GeneralCarInformationPageProps = {
+  params: {
+    carId: string
+  }
+}
 export default function GeneralCarInformationPage({
-  searchParams,
-}: {
-  searchParams: FormType
-}) {
+  params: { carId },
+}: GeneralCarInformationPageProps) {
+  const [currentCarImage, setCurrentCarImage] = useState()
   const pathname = usePathname()
 
   return (
@@ -18,15 +20,14 @@ export default function GeneralCarInformationPage({
       <ul className="text-white flex gap-4">
         <li
           className={`text-lg transition-all duration-500 border-b border-b-transparent hover:text-gray-300 ${
-            pathname === "/agency/updateCarDetails/general-information"
+            pathname === `/agency/updateCarDetails/general-information/${carId}`
               ? "border-b-white"
               : ""
           }`}
         >
           <Link
             href={{
-              pathname: "/agency/updateCarDetails/general-information",
-              query: searchParams,
+              pathname: `/agency/updateCarDetails/general-information/${carId}`,
             }}
           >
             Informations générales
@@ -34,22 +35,21 @@ export default function GeneralCarInformationPage({
         </li>
         <li
           className={`text-lg transition-all duration-500 border-b border-b-transparent hover:text-gray-300 ${
-            pathname === "agency/updateCarDetails/update-image"
+            pathname === `agency/updateCarDetails/update-image/${carId}`
               ? "border-b-white"
               : ""
           }`}
         >
           <Link
             href={{
-              pathname: "/agency/updateCarDetails/update-image",
-              query: searchParams,
+              pathname: `/agency/updateCarDetails/update-image/${carId}`,
             }}
           >
             Image
           </Link>
         </li>
       </ul>
-      <UpdateCarForm carDatas={searchParams} />
+      <UpdateCarForm carId={carId} />
     </div>
   )
 }

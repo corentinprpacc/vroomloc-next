@@ -1,8 +1,5 @@
-import { AddCarFormSchema } from "@/lib/schema"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
-import { z } from "zod"
-type FormType = z.infer<typeof AddCarFormSchema>
 const UpdateCarDetailsLayout = ({
   children,
 }: {

@@ -1,5 +1,6 @@
 "use client"
 
+import { getCarById } from "@/app/firebase/utils"
 import { Input } from "@/components/ui/input"
 import { SelectScrollable } from "@/components/ui/selectScrollable"
 import {
@@ -12,17 +13,15 @@ import {
 import { updateCarInfos } from "@/lib/actions"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
+import { useEffect } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./button"
 type FormType = z.infer<typeof AddCarFormSchema>
-
-function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
-  const [carImageUrl, setCarImageUrl] = useState("")
-
-  const { imageUrl, ...carDetails } = carDatas
-
+type UpdateCarInformationProps = {
+  carId: string
+}
+function UpdateCarForm({ carId }: UpdateCarInformationProps) {
   const {
     register,
     control,
@@ -33,17 +32,40 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
   } = useForm<FormType>({
     resolver: zodResolver(AddCarFormSchema),
     defaultValues: {
-      ...carDetails,
+      carId: carId,
     },
   })
+
+  useEffect(() => {
+    async function fetchCarDatas() {
+      const carTargeted = await getCarById(carId)
+
+      console.log("car targeted", carTargeted)
+      setValue("model", carTargeted.model)
+      setValue("brand", carTargeted.brand)
+      setValue("userId", carTargeted.userId)
+      setValue("carYear", carTargeted.carYear)
+      setValue("dayPrice", carTargeted.dayPrice)
+      setValue("weekPrice", carTargeted.weekPrice)
+      setValue("weekEndPrice", carTargeted.weekEndPrice)
+      setValue("horsePower", carTargeted.horsePower)
+      setValue("fuelType", carTargeted.fuelType)
+      setValue("rentDeposit", carTargeted.rentDeposit)
+      setValue("engineType", carTargeted.engineType)
+      setValue("kilometerAllowed", carTargeted.kilometerAllowed)
+      setValue("description", carTargeted.description)
+      setValue("numberOfSeat", carTargeted.numberOfSeat)
+      setValue("imageUrl", carTargeted.imageUrl)
+    }
+
+    fetchCarDatas()
+  }, [carId, setValue])
 
   const form = watch()
   const brandField = watch("brand")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {
-    const dataSent = { ...data, imageUrl: carImageUrl }
-
-    await updateCarInfos(dataSent, carDatas.carId!, carDatas.imageUrl)
+    await updateCarInfos(data, carId)
   }
   return (
     <form onSubmit={handleSubmit(proccessForm)}>

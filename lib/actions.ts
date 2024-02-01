@@ -259,16 +259,11 @@ export async function deleteCar(carId: string) {
   }
 }
 
-export async function updateCarInfos(
-  data: AddCarFormType,
-  carId: string,
-  carImage: string,
-) {
+export async function updateCarInfos(data: AddCarFormType, carId: string) {
   const result = AddCarFormSchema.safeParse(data)
   if (result.success) {
     await updateDoc(carsTargetedDocument(carId), {
       ...data,
-      imageUrl: carImage,
     })
 
     revalidateTag("get-user-cars")
