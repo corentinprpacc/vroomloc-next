@@ -52,9 +52,7 @@ export default function CarsList({ allCities }: CarsListProps) {
       <div className="container relative z-0">
         <p className="text-center my-4">Résultats</p>
         <div className="flex cards-block flex-wrap">
-          {cars?.map((car, id) => (
-            <CardCar key={id} getCar={car} />
-          ))}
+          {cars?.map((car, id) => <CardCar key={id} getCar={car} />)}
         </div>
       </div>
     </>
