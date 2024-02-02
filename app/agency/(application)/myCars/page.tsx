@@ -10,8 +10,8 @@ export default async function MyCars() {
   const carsList = await getUserCars(session?.user.id!)
 
   return (
-    <div className="bg-black text-white pt-6 min-h-screen">
-      <div className="flex justify-between items-center pl-2 pr-3 mb-8">
+    <div className="bg-black text-white min-h-screen">
+      <div className="flex justify-between items-center pl-2 pr-3 sticky top-0 z-20 bg-black h-20">
         <div></div>
         <h1 className="text-4xl font-bold bg-purple text-center text-white">
           Mes véhicules
@@ -23,7 +23,7 @@ export default async function MyCars() {
           </Link>
         </p>
       </div>
-      <div className="flex flex-wrap justify-around gap-2">
+      <div className="flex flex-wrap justify-around gap-2 pb-5">
         {carsList.map((car: Car, index: number) => {
           return <MyCarCard key={index} carDatas={car} />
         })}

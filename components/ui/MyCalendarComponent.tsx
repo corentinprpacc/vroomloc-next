@@ -9,7 +9,7 @@ type MyCalendarComponentProps = {
 
 function MyCalendarComponent({ listOrders }: MyCalendarComponentProps) {
   function showFunction(e: any) {
-    console.log("click on date: ", e.date)
+    alert("you clicked on a date ! ")
   }
 
   return (

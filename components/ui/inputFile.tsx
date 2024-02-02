@@ -8,7 +8,7 @@ type InputFileType = {
   setValue: any
 }
 
-export function InputFile({ label, register, setValue }: InputFileType) {
+export async function InputFile({ label, register, setValue }: InputFileType) {
   const handleImageChange = async (e: any) => {
     if (e.target.files.length > 0) {
       const selectedImage = e.target.files[0]

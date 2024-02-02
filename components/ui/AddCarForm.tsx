@@ -1,5 +1,6 @@
 "use client"
 
+import Loader from "@/components/ui/Loader"
 import { Input } from "@/components/ui/input"
 import { SelectScrollable } from "@/components/ui/selectScrollable"
 import {
@@ -25,6 +26,7 @@ type AddCarFormProps = {
 
 function AddCarForm({ currentUserId }: AddCarFormProps) {
   const [carImageUrl, setCarImageUrl] = useState("")
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false)
   const {
     register,
     control,
@@ -39,16 +41,14 @@ function AddCarForm({ currentUserId }: AddCarFormProps) {
     },
   })
 
-  const formValues = watch()
-
-  console.log("form values", formValues)
-
   const brandField = watch("brand")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {
+    setIsFormSubmitting(true)
     const dataSent = { ...data, imageUrl: carImageUrl }
 
     await addNewCar(dataSent)
+    setIsFormSubmitting(false)
   }
 
   const handleImageChange = async (e: any) => {
@@ -377,8 +377,8 @@ function AddCarForm({ currentUserId }: AddCarFormProps) {
       </div>
       <div className="flex justify-center mt-4 pb-4">
         <Button variant="outline" className="mt-2 w-48 text-black">
-          {isSubmitted ? (
-            <span className="text-green-700"> Envoyé !</span>
+          {isFormSubmitting ? (
+            <Loader className="h-8" />
           ) : (
             <span className="text-white-700"> Ajouter</span>
           )}

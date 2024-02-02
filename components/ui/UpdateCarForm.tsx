@@ -1,5 +1,7 @@
 "use client"
 
+import { getCarById } from "@/app/firebase/utils"
+import Loader from "@/components/ui/Loader"
 import { Input } from "@/components/ui/input"
 import { SelectScrollable } from "@/components/ui/selectScrollable"
 import {
@@ -10,22 +12,20 @@ import {
   numberOfSeat,
 } from "@/data"
 import { updateCarInfos } from "@/lib/actions"
-import sendImageToFirebaseStorage from "@/lib/functions/sendImageToFirebaseStorage"
 import { AddCarFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { useEffect, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./button"
 type FormType = z.infer<typeof AddCarFormSchema>
-
-function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
-  const router = useRouter()
-  const [carImageUrl, setCarImageUrl] = useState("")
-
-  const { imageUrl, ...carDetails } = carDatas
-
+type UpdateCarInformationProps = {
+  carId: string
+}
+function UpdateCarForm({ carId }: UpdateCarInformationProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { data: session, update } = useSession()
   const {
     register,
     control,
@@ -36,31 +36,42 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
   } = useForm<FormType>({
     resolver: zodResolver(AddCarFormSchema),
     defaultValues: {
-      ...carDetails,
+      carId: carId,
     },
   })
+
+  useEffect(() => {
+    async function fetchCarDatas() {
+      const carTargeted = await getCarById(carId, session?.user.id!)
+
+      setValue("model", carTargeted.model)
+      setValue("brand", carTargeted.brand)
+      setValue("userId", carTargeted.userId)
+      setValue("carYear", carTargeted.carYear)
+      setValue("dayPrice", carTargeted.dayPrice)
+      setValue("weekPrice", carTargeted.weekPrice)
+      setValue("weekEndPrice", carTargeted.weekEndPrice)
+      setValue("horsePower", carTargeted.horsePower)
+      setValue("fuelType", carTargeted.fuelType)
+      setValue("rentDeposit", carTargeted.rentDeposit)
+      setValue("engineType", carTargeted.engineType)
+      setValue("kilometerAllowed", carTargeted.kilometerAllowed)
+      setValue("description", carTargeted.description)
+      setValue("numberOfSeat", carTargeted.numberOfSeat)
+      setValue("imageUrl", carTargeted.imageUrl)
+    }
+
+    fetchCarDatas()
+  }, [carId, setValue, session?.user.id])
 
   const form = watch()
   const brandField = watch("brand")
 
   const proccessForm: SubmitHandler<FormType> = async (data) => {
-    const dataSent = { ...data, imageUrl: carImageUrl }
-
-    await updateCarInfos(dataSent, carDatas.carId!, carDatas.imageUrl)
+    setIsSubmitting(true)
+    await updateCarInfos(data, carId)
+    setIsSubmitting(false)
   }
-
-  const handleImageChange = async (e: any, field: any) => {
-    if (e.target.files.length > 0) {
-      const selectedImage = e.target.files[0]
-
-      const imageUrl = await sendImageToFirebaseStorage(selectedImage)
-
-      if (imageUrl) {
-        setCarImageUrl(imageUrl)
-      }
-    }
-  }
-
   return (
     <form onSubmit={handleSubmit(proccessForm)}>
       <div>
@@ -352,8 +363,8 @@ function UpdateCarForm({ carDatas }: { carDatas: FormType }) {
       </div>
       <div className="flex justify-center mt-4 pb-4">
         <Button variant="outline" className="mt-2 w-48 text-black">
-          {isSubmitted ? (
-            <span className="text-green-700"> Envoyé !</span>
+          {isSubmitting ? (
+            <Loader className="h-8" />
           ) : (
             <span className="text-white-700"> Ajouter</span>
           )}

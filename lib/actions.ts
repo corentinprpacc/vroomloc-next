@@ -247,29 +247,20 @@ export async function updateUserGlobalInfos(
 
 export async function deleteCar(carId: string) {
   try {
-    console.log("deleted car id", carId)
     await deleteDoc(carsTargetedDocument(carId))
 
     revalidateTag("get-user-cars")
     return true
   } catch (error) {
-    console.log("voiture non supprimé", error)
-
     return false
   }
 }
 
-export async function updateCarInfos(
-  data: AddCarFormType,
-  carId: string,
-  carImage: string,
-) {
-  console.log("caar id", carId)
+export async function updateCarInfos(data: AddCarFormType, carId: string) {
   const result = AddCarFormSchema.safeParse(data)
   if (result.success) {
     await updateDoc(carsTargetedDocument(carId), {
       ...data,
-      imageUrl: carImage,
     })
 
     revalidateTag("get-user-cars")
@@ -278,6 +269,21 @@ export async function updateCarInfos(
   } else {
     return false
   }
+}
+export async function updateCarImage(carId: string, carImage: string) {
+  try {
+    await updateDoc(carsTargetedDocument(carId), {
+      imageUrl: carImage,
+    })
+
+    revalidateTag("get-user-cars")
+  } catch (error) {
+    throw new Error(
+      " Erreur lors de la modification de l'image dans la base de données",
+    )
+  }
+
+  redirect("/agency/myCars")
 }
 
 export const getCarReservations = async (carId: string): Promise<any[]> => {

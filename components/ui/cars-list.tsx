@@ -1,11 +1,11 @@
 "use client"
-import CardCar from "@/components/ui/card-car"
-import { useState, useEffect } from "react"
-import { Car } from "@/app/firebase/types"
-import { query, where, getDocs } from "firebase/firestore"
 import { carsCollection } from "@/app/firebase/collections"
+import { Car } from "@/app/firebase/types"
 import SearchCarsListForm from "@/components/ui/SearchCarsListForm"
+import CardCar from "@/components/ui/card-car"
+import { getDocs, query, where } from "firebase/firestore"
 import { useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
 type CarsListProps = {
   allCities: string[]
@@ -39,7 +39,6 @@ export default function CarsList({ allCities }: CarsListProps) {
   }, [searchCity])
 
   const handleInputChange = (inputValue: string) => {
-    console.log("Handle Input Change")
     setSearchCity(inputValue)
   }
 
