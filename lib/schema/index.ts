@@ -128,25 +128,25 @@ export const UpdateProfileFormSchema = z.object({
 })
 
 export const BookFormSchema = z.object({
-  startDate: z.date(),
-  endDate: z.date(),
-  paymentOptions: z.object({
-    name: z.string(),
-    value: z.boolean(),
-    price: z.number(),
-  }),
+  // startDate: z.date(),
+  // endDate: z.date(),
+  // paymentOptions: z.object({
+  //   name: z.string(),
+  //   value: z.boolean(),
+  //   price: z.number(),
+  // }),
   guaranteeOptions: z.object({
     name: z.string(),
     value: z.boolean(),
     price: z.number(),
   }),
-  kilometersOptions: z.object({
-    km: z.number(),
-    value: z.boolean(),
-    price: z.number(),
-  }),
-  moreKilometersOptions: z.object({
-    km: z.number(),
-    price: z.number(),
-  }),
+  // kilometersOptions: z.object({
+  //   km: z.number(),
+  //   value: z.boolean(),
+  //   price: z.number(),
+  // }),
+  // moreKilometersOptions: z.object({
+  //   km: z.number(),
+  //   price: z.number(),
+  // }),
 })
