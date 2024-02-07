@@ -18,15 +18,15 @@ import { BookFormSchema } from "@/lib/schema"
 
 type FormValues = z.infer<typeof BookFormSchema>
 
-interface InputRadioFormProps<T> {
+interface InputCheckboxFormProps<T> {
   data: Array<{ name: string; value: boolean; price: number }>
   handleClick: (index: number) => void
 }
 
-const InputRadioForm = <T extends keyof FormValues>({
+const InputCheckboxForm = <T extends keyof FormValues>({
   data,
   handleClick,
-}: InputRadioFormProps<T>) => {
+}: InputCheckboxFormProps<T>) => {
   return (
     <>
       {data.map((option, index) => (
@@ -35,12 +35,12 @@ const InputRadioForm = <T extends keyof FormValues>({
             className="relative inline-flex cursor-pointer"
             onClick={() => handleClick(index)}
           >
-            <span>
+            <span className="w-[24px] h-[24px]">
               <Image
                 src={
                   option.value
-                    ? "/images/icons/radio-button-checked-icon.svg"
-                    : "/images/icons/radio-button-unchecked-icon.svg"
+                    ? "/images/icons/checkbox-checked-icon.svg"
+                    : "/images/icons/checkbox-unchecked-icon.svg"
                 }
                 alt={option.value ? "Checked button" : "Unchecked button"}
                 width={24}
@@ -56,4 +56,4 @@ const InputRadioForm = <T extends keyof FormValues>({
   )
 }
 
-export default InputRadioForm
+export default InputCheckboxForm

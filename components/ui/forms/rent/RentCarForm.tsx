@@ -16,6 +16,8 @@ import { BookFormSchema } from "@/lib/schema"
 import FixedSlider from "@/components/ui/slider"
 import InputRadioForm from "../../InputRadioForm"
 import React from "react"
+import InputCheckboxForm from "../../InputCheckboxForm"
+import { updateDoc } from "firebase/firestore"
 
 type FormValues = z.infer<typeof BookFormSchema>
 
@@ -30,14 +32,13 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
     control,
     handleSubmit,
     watch,
-    formState,
-    formState: { isValidating },
+    formState: { isValidating, errors },
   } = useForm<FormValues>({
     resolver: zodResolver(BookFormSchema),
     defaultValues: {
-      //   paymentOptions: { name: "", value: false, price: 0 },
+      paymentOptions: { name: "", value: false, price: 0 },
       guaranteeOptions: { name: "", value: false, price: 0 },
-      //   kilometersOptions: { km: 0, value: false, price: 0 },
+      kilometersOptions: { name: "", value: false, price: 0 },
     },
   })
   const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data)
@@ -48,11 +49,35 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
   initialEndDate.setDate(initialEndDate.getDate() + 2)
   const [endDate, setEndDate] = useState(initialEndDate)
   const classes = "basis-1/2"
+  const [paymentOptions, setPaymentOptions] = useState([
+    { name: "Acompte", value: true, price: 300 },
+    { name: "Total", value: false, price: 600 },
+  ])
   const [guaranteeOptions, setGuaranteeOptions] = useState([
     { name: "Caution Basique 3000 EUR", value: true, price: 3000 },
     { name: "Caution réduite à 2500 EUR", value: false, price: 2500 },
   ])
-  console.log("car ", car)
+  const [kilometersOptions, setKilometersOptions] = useState([
+    { name: "600 km", value: true, price: 200 },
+    { name: "800 km", value: false, price: 250 },
+  ])
+  const [moreKilometersOptions, setMoreKilometersOptions] = useState([
+    { km: 0, price: 0 },
+    { km: 100, price: 50 },
+    { km: 200, price: 100 },
+    { km: 300, price: 150 },
+    { km: 400, price: 200 },
+    { km: 500, price: 250 },
+  ])
+  const [moreOptions, setMoreOptions] = useState([
+    { name: "Décoration florale mariage", value: true, price: 200 },
+    {
+      name: "Package Premium Mariage (décoration florale voiture + vidéaste professionnel)",
+      value: false,
+      price: 250,
+    },
+    { name: "Shooting photo/vidéo professionnelle", value: true, price: 200 },
+  ])
 
   const handleOptionsClick = <T extends keyof FormValues>(
     index: number,
@@ -60,9 +85,7 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
     options: FormValues[T][],
     optionName: T,
   ) => {
-    console.log("heee")
     const updatedOptions = options.map((option, i) => {
-      console.log(option.value)
       if (i === index) {
         return { ...option, value: true }
       } else {
@@ -71,6 +94,41 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
     })
     setOptions(updatedOptions)
     setValue(optionName as any, updatedOptions[index] as any)
+  }
+
+  const handleMultipleOptionsClick = <T extends keyof FormValues>(
+    index: number,
+    setOptions: React.Dispatch<React.SetStateAction<typeof moreOptions>>,
+    options: typeof moreOptions,
+    optionName: T,
+  ) => {
+    const updatedOptions: typeof moreOptions = options.map((option, i) => {
+      if ("value" in option && i === index) {
+        const updatedOption = {
+          name: option.name,
+          price: option.price,
+          value: !option.value,
+        }
+        return updatedOption
+      }
+      return option
+    })
+    setOptions(updatedOptions)
+    const selectedOptions = updatedOptions.filter((option) => {
+      if ("value" in option) {
+        return option.value === true
+      }
+      return false
+    })
+    setValue(optionName as any, selectedOptions)
+  }
+
+  const handleInputSliderChange = (
+    selectedKilometerOption: { km: number; price: number } | null,
+  ) => {
+    if (selectedKilometerOption !== null) {
+      setValue("moreKilometersOptions", selectedKilometerOption)
+    }
   }
   return (
     <>
@@ -113,47 +171,28 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
           </div>
         </div>
         <div className="flex flex-wrap w-full bg-black px-6 pb-6">
-          {/* <SearchDatePicker
+          <SearchDatePicker
             control={control}
             startDate={startDate}
             endDate={endDate}
             classes={classes}
-          /> */}
+          />
         </div>
         <div className="flex flex-wrap w-full bg-black px-6 pb-6 text-white">
           <p className="py-2">OPTIONS DE PAIEMENT</p>
           <hr className="w-full" />
           <div>
-            {/* {paymentOptions.map((option, index) => (
-            <label className="inline-flex mr-4 mt-4" key={index}>
-              <span
-                className="relative inline-flex cursor-pointer"
-                onClick={() =>
-                  handleOptionsClick(
-                    index,
-                    paymentOptions,
-                    setPaymentOptions,
-                    "paymentOptions",
-                  )
-                }
-              >
-                <span>
-                  <Image
-                    src={
-                      option.value
-                        ? "/images/icons/radio-button-checked-icon.svg"
-                        : "/images/icons/radio-button-unchecked-icon.svg"
-                    }
-                    alt={option.value ? "Checked button" : "Unchecked button"}
-                    width={24}
-                    height={24}
-                    className="relative z-10"
-                  />
-                </span>
-              </span>
-              <span className="ml-2">{option.name}</span>
-            </label>
-          ))} */}
+            <InputRadioForm
+              data={paymentOptions}
+              handleClick={(index) =>
+                handleOptionsClick(
+                  index,
+                  setPaymentOptions,
+                  paymentOptions,
+                  "paymentOptions",
+                )
+              }
+            />
           </div>
         </div>
         <div className="flex flex-wrap w-full bg-black px-6 pb-6 text-white">
@@ -170,9 +209,6 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
                   "guaranteeOptions",
                 )
               }
-              //   setOptions={setGuaranteeOptions}
-              optionName="guaranteeOptions"
-              options={guaranteeOptions}
             />
           </div>
         </div>
@@ -180,50 +216,44 @@ const RentCarForm: React.FC<RentCarFormProps> = ({ car }: RentCarFormProps) => {
           <p className="py-2">KILOMETRES INCLUS :</p>
           <hr className="w-full" />
           <div>
-            {/* {kilometersOptions.map((option, index) => (
-            <label className="inline-flex mr-4 mt-4" key={index}>
-              <span
-                className="relative inline-flex cursor-pointer"
-                onClick={() =>
-                  handleOptionsClick(
-                    index,
-                    kilometersOptions,
-                    setKilometersOptions,
-                    "kilometersOptions",
-                  )
-                }
-              >
-                <span>
-                  <Image
-                    src={
-                      option.value
-                        ? "/images/icons/radio-button-checked-icon.svg"
-                        : "/images/icons/radio-button-unchecked-icon.svg"
-                    }
-                    alt={option.value ? "Checked button" : "Unchecked button"}
-                    width={24}
-                    height={24}
-                    className="relative z-10"
-                  />
-                </span>
-              </span>
-              <span className="ml-2">{option.km} km</span>
-            </label>
-          ))} */}
+            <InputRadioForm
+              data={kilometersOptions}
+              handleClick={(index) =>
+                handleOptionsClick(
+                  index,
+                  setKilometersOptions,
+                  kilometersOptions,
+                  "kilometersOptions",
+                )
+              }
+            />
           </div>
         </div>
         <div className="w-full bg-black px-6 pb-6 text-white">
           <p className="py-2">KILOMETRES SUPPLÉMENTAIRES</p>
           <hr className="w-full mb-6" />
-          {/* <FixedSlider
-          control={control}
-          moreKilometersOptions={moreKilometersOptions}
-          onInputSliderChange={handleInputSliderChange}
-        /> */}
+          <FixedSlider
+            control={control}
+            moreKilometersOptions={moreKilometersOptions}
+            onInputSliderChange={handleInputSliderChange}
+          />
         </div>
         <div className="w-full bg-black px-6 pb-6 text-white">
           <p className="py-2">KILOMETRES SUPPLÉMENTAIRES</p>
           <hr className="w-full" />
+          <div>
+            <InputCheckboxForm
+              data={moreOptions}
+              handleClick={(index) =>
+                handleMultipleOptionsClick(
+                  index,
+                  setMoreOptions,
+                  moreOptions,
+                  "moreOptions",
+                )
+              }
+            />
+          </div>
         </div>
       </form>
     </>
