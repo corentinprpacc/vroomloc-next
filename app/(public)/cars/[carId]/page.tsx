@@ -8,17 +8,9 @@ import { Button } from "@/components/ui/button"
 import useTextToggle from "@/lib/hooks/toggleText"
 import Carousel from "@/components/ui/carousel"
 import RentCarForm from "@/components/ui/forms/rent/RentCarForm"
-interface CarDetailsModalProps {
-  onClose: () => void
-  isOpen: boolean
-  id: string
-}
+import { useRouter, usePathname } from "next/navigation"
 
-const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
-  onClose,
-  isOpen,
-  id,
-}: CarDetailsModalProps) => {
+export default function CarDetailsModal() {
   const [car, setCar] = useState<Car | null>(null)
   const initialDescription =
     "Documents demandées : permis de conduire, pièce identité et justificatif de domicile de moins de 3 mois. Caution : Empreinte de carte ou cash (si le propriétaire accepte) Fabriqué pour les conducteurs de véhicules de haute performance ! Le BMW M5 est"
@@ -27,6 +19,9 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
     toggleText,
     showFullText,
   } = useTextToggle(initialDescription, 200)
+  const router = useRouter()
+  const pathname = usePathname().split("/")
+  const id = pathname[pathname.length - 1]
   useEffect(() => {
     async function getCar() {
       if (id) {
@@ -38,14 +33,13 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
     getCar()
   }, [id])
 
+  const closeModal = () => {
+    router.back()
+  }
+
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onRequestClose={onClose}
-        contentLabel="Modal"
-        portalClassName="modal"
-      >
+      <Modal isOpen={true} contentLabel="Modal" portalClassName="modal">
         <div className="absolute w-full h-full z-0 brightness-75">
           <Image
             src="/images/car-image.webp"
@@ -58,7 +52,7 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
         <div className="relative z-10 px-8 pt-8 flex flex-wrap">
           <div className="basis-full grow-0">
             <div className="text-right">
-              <button onClick={onClose}>
+              <button onClick={closeModal}>
                 <Image
                   src="/images/icons/remove-white-icon.svg"
                   alt="Close Modal"
@@ -158,5 +152,3 @@ const CarsDetailsModal: React.FC<CarDetailsModalProps> = ({
     </>
   )
 }
-
-export default CarsDetailsModal

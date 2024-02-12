@@ -3,9 +3,6 @@ import { Car } from "@/app/firebase/types"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "./button"
-import { useState } from "react"
-import { usePathname, useRouter, useParams } from "next/navigation"
-import CarsDetailsModal from "@/app/cars/[carId]"
 import React from "react"
 
 interface Props {
@@ -13,30 +10,11 @@ interface Props {
 }
 
 const CardCar: React.FC<Props> = ({ getCar }: Props) => {
-  const [modalIsOpen, setModalIsOpen] = useState(false)
-  const pathName = usePathname()
-  const router = useRouter()
-  const modalUrl = `/cars/${encodeURIComponent(getCar.brand)}-${encodeURIComponent(getCar.model)}?id=${getCar.id}`
-  const pageUrl = "/cars"
-
-  const openModalPage = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    setModalIsOpen(true)
-    window.history.pushState({}, "", modalUrl)
-    document.body.classList.add("overflow-hidden")
-    return false
-  }
-
-  const closeModal = () => {
-    window.history.pushState({}, "", pageUrl)
-    setModalIsOpen(false)
-    document.body.classList.remove("overflow-hidden")
-    router.push(pageUrl)
-  }
+  const modalUrl = `/cars/${getCar.id}`
   return (
     <>
       <div className="w-full md:h-full md:max-w-[25%] md:pl-6 mt-8 md:mt-6 md:grow-0 group">
-        <Link href={modalUrl} onClick={openModalPage}>
+        <Link href={modalUrl}>
           <div className="relative w-full h-auto md:max-h-[25%] relative">
             <Image
               src="/images/car-image.webp"
@@ -63,13 +41,6 @@ const CardCar: React.FC<Props> = ({ getCar }: Props) => {
           </div>
         </Link>
       </div>
-      {modalIsOpen && (
-        <CarsDetailsModal
-          onClose={closeModal}
-          isOpen={modalIsOpen}
-          id={getCar.id}
-        />
-      )}
     </>
   )
 }
