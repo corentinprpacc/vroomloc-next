@@ -5,6 +5,7 @@ import "swiper/css/navigation"
 import "swiper/css/pagination"
 import Image from "next/image"
 
+// Waiting for dynamic images
 // interface CarouselProps {
 //   slides?: string[]
 // }
