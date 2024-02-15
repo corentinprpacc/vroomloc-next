@@ -39,7 +39,6 @@ export default function CarsList({ allCities }: CarsListProps) {
   }, [searchCity])
 
   const handleInputChange = (inputValue: string) => {
-    console.log("Handle Input Change")
     setSearchCity(inputValue)
   }
 

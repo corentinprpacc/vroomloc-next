@@ -1,3 +1,4 @@
+import { Book } from "lucide-react"
 import { z } from "zod"
 
 export const LoginFormSchema = z.object({
@@ -125,4 +126,35 @@ export const UpdateProfileFormSchema = z.object({
     .string()
     .min(1, { message: "Veuillez saisir le numéro de tel. de l'agence" })
     .regex(phoneRegex, "Veuillez saisir un numéro de téléphone valide"),
+})
+
+export const BookFormSchema = z.object({
+  startDate: z.date(),
+  endDate: z.date(),
+  paymentOptions: z.object({
+    name: z.string(),
+    value: z.boolean(),
+    price: z.number(),
+  }),
+  guaranteeOptions: z.object({
+    name: z.string(),
+    value: z.boolean(),
+    price: z.number(),
+  }),
+  kilometersOptions: z.object({
+    name: z.string(),
+    value: z.boolean(),
+    price: z.number(),
+  }),
+  moreKilometersOptions: z.object({
+    km: z.number(),
+    price: z.number(),
+  }),
+  moreOptions: z.array(
+    z.object({
+      name: z.string(),
+      value: z.boolean(),
+      price: z.number(),
+    }),
+  ),
 })

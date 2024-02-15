@@ -44,6 +44,30 @@ export const getAllCars = async (): Promise<Car[]> => {
   }))
 }
 
+export const getCarById = async (id: string): Promise<Car | null> => {
+  const queryCar = query(carsCollection, where("id", "==", id))
+  const docsCar = await getDocs(queryCar)
+  if (docsCar.docs.length === 0) {
+    return null
+  }
+  const carsMap = docsCar.docs.map((doc) => {
+    return { ...doc.data() }
+  })
+  return carsMap[0] as Car
+}
+
+// export const getCarById = async (id: string): Promise<any | null> => {
+//   const queryCars = query(carsCollection, where("carId", "==", id))
+//   const docsCar = await getDocs(queryCars)
+//   if (docsCar.docs.length === 0) {
+//     return null
+//   }
+//   const carDatas = docsCar.docs[0].data()
+
+//   console.log("userdatas", carDatas)
+//   return carDatas
+// }
+
 export const getAllOrders = async (): Promise<Order[]> => {
   const ordersDocs = await getDocs(ordersCollection)
   return ordersDocs.docs.map((doc) => ({
@@ -76,18 +100,6 @@ export const getUserRefByEmail = async (
   })
   return usersMap[0]
 }
-export const getCarById = async (id: string): Promise<any | null> => {
-  const queryCars = query(carsCollection, where("carId", "==", id))
-  const docsCar = await getDocs(queryCars)
-  if (docsCar.docs.length === 0) {
-    return null
-  }
-  const carDatas = docsCar.docs[0].data()
-
-  console.log("userdatas", carDatas)
-  return carDatas
-}
-
 export const getUserCars = unstable_cache(
   async (id: string): Promise<Car[]> => {
     const queryCars = query(carsCollection, where("userId", "==", id))

@@ -8,16 +8,18 @@ interface DatePickerProps {
   control: any
   startDate: Date
   endDate: Date
+  classes?: String
 }
 
 const SearchDatePicker: React.FC<DatePickerProps> = ({
   control,
   startDate,
   endDate,
+  classes,
 }) => {
   return (
     <>
-      <div className="relative">
+      <div className={`relative ${classes}`}>
         <label className="absolute z-10 top-4 left-4 px-2 text-[#c2c2c2] text-xs bg-black">
           Départ
         </label>
@@ -31,12 +33,12 @@ const SearchDatePicker: React.FC<DatePickerProps> = ({
               selected={field.value}
               startDate={startDate}
               onChange={field.onChange}
-              className="w-full md:w-auto mt-6 bg-black text-white border border-solid border-white/50 hover:border-white py-4 px-8"
+              className={`w-full mt-6 bg-black text-white border border-solid border-white/50 hover:border-white py-4 px-8 ${classes ? "" : "md:w-auto"}`}
             />
           )}
         />
       </div>
-      <div className="relative">
+      <div className={`relative ${classes}`}>
         <label className="absolute z-10 top-4 left-4 px-2 text-[#c2c2c2] text-xs bg-black">
           Retour
         </label>
@@ -52,7 +54,7 @@ const SearchDatePicker: React.FC<DatePickerProps> = ({
               endDate={endDate}
               startDate={startDate}
               minDate={startDate}
-              className="w-full md:w-auto mt-6 bg-black text-white border border-solid border-white/50 hover:border-white py-4 px-8"
+              className={`w-full mt-6 bg-black text-white border border-solid border-white/50 hover:border-white py-4 px-8 ${classes ? "" : "md:w-auto"}`}
             />
           )}
         />
